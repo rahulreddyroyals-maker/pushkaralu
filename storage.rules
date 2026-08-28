@@ -1,0 +1,54 @@
+rules_version = '2';
+
+// =============================================================================
+// Pushkaralu — Storage Security Rules
+//
+// Layout convention: images/{entityType}/{entityId}/{filename}
+// e.g. images/ghats/ghat-abc123/hero.jpg
+//
+// Same role source of truth as firestore.rules: request.auth.token.role,
+// a server-set custom claim — never trust anything else.
+// =============================================================================
+
+function isSignedIn() {
+  return request.auth != null;
+}
+
+function role() {
+  return isSignedIn() ? request.auth.token.role : null;
+}
+
+function isStaff() {
+  return role() in ['EDITOR', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN'];
+}
+
+function isReasonableImage() {
+  return request.resource.size < 8 * 1024 * 1024 // 8MB cap
+    && request.resource.contentType.matches('image/.*');
+}
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Content images (events, ghats, temples) — admin-managed content,
+    // public read (they're displayed on public pages), staff-only write.
+    match /images/{entityType}/{entityId}/{fileName} {
+      allow read: if true;
+      allow write: if isStaff() && isReasonableImage();
+      allow delete: if isStaff();
+    }
+
+    // Provider-uploaded images (hotels, purohits, businesses) — deferred
+    // to the sprint that implements those modules; default-denied here
+    // until that ownership model exists, rather than left open.
+    match /images/providers/{providerId}/{fileName} {
+      allow read: if true;
+      allow write, delete: if false;
+    }
+
+    // Default deny for anything not explicitly matched above.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

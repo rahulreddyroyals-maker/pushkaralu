@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+/*
+ * Pushkaralu Design System — Sprint 1
+ * River-inspired pilgrimage + tourism visual language.
+ * See docs/DESIGN_SYSTEM.md for the full rationale.
+ */
+:root {
+  --background: #faf8f4;
+  --foreground: #16262e;
+
+  /* Brand */
+  --color-river-deep: #0e4c5c;
+  --color-river-current: #1c7c93;
+  --color-river-mist: #dceef2;
+  --color-saffron: #e8961f;
+  --color-saffron-light: #fdf0dc;
+  --color-ember: #c4501f;
+  --color-surface: #faf8f4;
+  --color-surface-raised: #ffffff;
+  --color-ink: #16262e;
+  --color-ink-muted: #4b5c63;
+  --color-border: #e4ddd2;
+
+  /* Status (crowd levels, booking states — semantically separate from brand) */
+  --color-status-low: #2f9e5b;
+  --color-status-moderate: #d9a61c;
+  --color-status-high: #e0672b;
+  --color-status-critical: #c93b3b;
+
+  /* Radii & shadow */
+  --radius-card: 0.75rem;
+  --shadow-card: 0 1px 2px rgba(22, 38, 46, 0.04), 0 8px 24px -12px rgba(14, 76, 92, 0.18);
+  --shadow-card-hover: 0 4px 10px rgba(22, 38, 46, 0.06), 0 16px 32px -12px rgba(14, 76, 92, 0.24);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-river-deep: var(--color-river-deep);
+  --color-river-current: var(--color-river-current);
+  --color-river-mist: var(--color-river-mist);
+  --color-saffron: var(--color-saffron);
+  --color-saffron-light: var(--color-saffron-light);
+  --color-ember: var(--color-ember);
+  --color-surface: var(--color-surface);
+  --color-surface-raised: var(--color-surface-raised);
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-border: var(--color-border);
+  --color-status-low: var(--color-status-low);
+  --color-status-moderate: var(--color-status-moderate);
+  --color-status-high: var(--color-status-high);
+  --color-status-critical: var(--color-status-critical);
+
+  /* Type: geometric sans display/body, monospace utility for data/status/timestamps */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0d1a1f;
+    --foreground: #f2ede4;
+    --color-surface: #0d1a1f;
+    --color-surface-raised: #12262d;
+    --color-border: #234049;
+    --color-ink: #f2ede4;
+    --color-ink-muted: #a9bcc2;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Utility: tabular figures for status/data/timestamps (crowd status, prices) */
+.font-data {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}

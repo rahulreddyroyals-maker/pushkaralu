@@ -1,0 +1,297 @@
+rules_version = '2';
+
+// =============================================================================
+// Pushkaralu — Firestore Security Rules
+//
+// Source of truth for authorization: request.auth.token.role, a Firebase
+// custom claim set ONLY by server-side code (see src/lib/firebase/admin.ts,
+// src/app/api/admin/users/[uid]/role/route.ts). This file must NEVER trust
+// a `role` field read from a document — that field is a denormalized copy
+// for display/query convenience only (see docs/DATABASE_SCHEMA.md).
+//
+// Mirrors docs/ROLES_PERMISSIONS.md — keep both in sync by hand.
+// =============================================================================
+
+function isSignedIn() {
+  return request.auth != null;
+}
+
+function role() {
+  return isSignedIn() ? request.auth.token.role : null;
+}
+
+function isOwner(uid) {
+  return isSignedIn() && request.auth.uid == uid;
+}
+
+function isStaff() {
+  return role() in ['EDITOR', 'MODERATOR', 'ADMIN', 'SUPER_ADMIN'];
+}
+
+function isModerator() {
+  return role() in ['MODERATOR', 'ADMIN', 'SUPER_ADMIN'];
+}
+
+function isAdmin() {
+  return role() in ['ADMIN', 'SUPER_ADMIN'];
+}
+
+function isSuperAdmin() {
+  return role() == 'SUPER_ADMIN';
+}
+
+function isProviderRole() {
+  return role() in ['PROVIDER', 'PUROHIT', 'HOTEL_OWNER', 'TRAVEL_OPERATOR', 'BOAT_OPERATOR', 'BUSINESS_OWNER'];
+}
+
+// True if this write does not attempt to change the `role` field — used to
+// block a user from ever writing their own role via a normal profile
+// update, even though they're allowed to update other fields on their doc.
+function roleFieldUnchanged() {
+  return !('role' in request.resource.data) ||
+    !('role' in resource.data) ||
+    request.resource.data.role == resource.data.role;
+}
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -------------------------------------------------------------------
+    // users/{uid}
+    // -------------------------------------------------------------------
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isStaff();
+      // Create only via server (Admin SDK bypasses rules entirely for the
+      // register-profile route) — direct client creates are never allowed,
+      // which also means a client can never set its own initial role.
+      allow create: if false;
+      // A user may update their OWN doc, but never the `role` field.
+      // Staff may update any user's doc (support/admin corrections) but
+      // are ALSO blocked from changing `role` here — role changes must go
+      // through /api/admin/users/[uid]/role so they're audit-logged.
+      allow update: if (isOwner(uid) || isStaff()) && roleFieldUnchanged();
+      allow delete: if false;
+    }
+
+    // -------------------------------------------------------------------
+    // events/{eventId} (+ ghats, schedules, announcements subcollections)
+    // -------------------------------------------------------------------
+    match /events/{eventId} {
+      allow read: if resource.data.published == true || isStaff();
+      allow write: if isAdmin();
+
+      match /ghats/{ghatId} {
+        allow read: if resource.data.published == true || isStaff();
+        // Full ghat edits (facilities, images, etc.) are admin; crowd
+        // status alone is a moderator-level operational task — the split
+        // is enforced at the application layer (Route Handlers), since
+        // Firestore rules can't cheaply distinguish "only the
+        // crowdStatus field changed" from a full edit without listing
+        // every other field explicitly. Direct client writes here are
+        // intentionally admin-only; the moderator crowd-status path goes
+        // through /api/admin/events/[eventId]/ghats/[ghatId]/crowd-status,
+        // which uses the Admin SDK (bypasses these rules) after checking
+        // isModerator() in application code.
+        allow write: if isAdmin();
+      }
+      match /schedules/{scheduleId} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+      match /announcements/{announcementId} {
+        allow read: if resource.data.published == true || isStaff();
+        allow write: if isAdmin();
+      }
+    }
+
+    // -------------------------------------------------------------------
+    // temples/{templeId}
+    // -------------------------------------------------------------------
+    match /temples/{id} {
+      allow read: if resource.data.published == true || isStaff();
+      allow write: if isAdmin();
+    }
+    match /rituals/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /emergencyContacts/{id} {
+      allow read: if true;
+      allow write: if isAdmin(); // never user-submitted, per spec Module 11
+    }
+    match /tourismPlaces/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /announcements/{id} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+    match /news/{id} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    // -------------------------------------------------------------------
+    // Provider-owned listings — owner can manage their own, admin can
+    // manage any, everyone can read approved ones.
+    // -------------------------------------------------------------------
+    match /hotels/{id} {
+      allow read: if true;
+      allow create: if isProviderRole();
+      allow update, delete: if isAdmin() ||
+        (isOwner(resource.data.ownerId) && isProviderRole());
+    }
+    match /purohits/{id} {
+      allow read: if true;
+      allow create: if isProviderRole();
+      allow update, delete: if isAdmin() ||
+        (isOwner(resource.data.userId) && isProviderRole());
+    }
+    match /boatOperators/{id} {
+      allow read: if true;
+      allow create: if isProviderRole();
+      allow update, delete: if isAdmin() ||
+        (isOwner(resource.data.ownerId) && isProviderRole());
+    }
+    match /boats/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /restaurants/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /parkingLocations/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /hospitals/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /businesses/{id} {
+      allow read: if true;
+      allow create: if isSignedIn(); // registration flow — Module 20
+      allow update, delete: if isAdmin() ||
+        (isOwner(resource.data.ownerId) && isProviderRole());
+    }
+    match /packages/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // -------------------------------------------------------------------
+    // Bookings / payments — never client-writable for payment state
+    // -------------------------------------------------------------------
+    match /bookings/{id} {
+      allow read: if isAdmin() ||
+        (isSignedIn() && resource.data.userId == request.auth.uid) ||
+        (isProviderRole() && isSignedIn() && resource.data.providerId == request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      // Status transitions are business logic best enforced server-side
+      // (Cloud Function / Route Handler) once Module 18 ships — rules
+      // here only guard the read/create boundary for Sprint 2.
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+    match /payments/{id} {
+      allow read: if isAdmin() ||
+        (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow write: if false; // written exclusively by server (webhook/Cloud Function)
+    }
+
+    // -------------------------------------------------------------------
+    // Reviews
+    // -------------------------------------------------------------------
+    match /reviews/{id} {
+      allow read: if true;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isModerator() ||
+        (isOwner(resource.data.userId));
+      allow delete: if isModerator();
+    }
+
+    // -------------------------------------------------------------------
+    // Per-user private subcollections
+    // -------------------------------------------------------------------
+    match /favorites/{uid}/items/{itemId} {
+      allow read, write: if isOwner(uid);
+    }
+    match /notifications/{uid}/items/{itemId} {
+      allow read: if isOwner(uid);
+      allow write: if false; // server-written only
+    }
+
+    // -------------------------------------------------------------------
+    // Lost & Found — PII protection via moderation
+    // -------------------------------------------------------------------
+    match /lostFoundReports/{id} {
+      allow read: if isModerator() || (isSignedIn() && resource.data.reporterUid == request.auth.uid);
+      allow create: if isSignedIn();
+      allow update, delete: if isModerator();
+    }
+
+    // -------------------------------------------------------------------
+    // Family safety
+    // -------------------------------------------------------------------
+    match /familyGroups/{groupId} {
+      allow read, write: if isSignedIn() && request.auth.uid in resource.data.memberUids;
+      allow create: if isSignedIn();
+
+      match /locations/{uid} {
+        allow read: if isSignedIn() && request.auth.uid == uid ||
+          get(/databases/$(database)/documents/familyGroups/$(groupId)).data.memberUids.hasAny([request.auth.uid]);
+        allow write: if isOwner(uid);
+      }
+    }
+
+    // -------------------------------------------------------------------
+    // Advertising / campaigns — admin only, click/impression counters are
+    // server-incremented (Cloud Function) to prevent trivial fraud.
+    // -------------------------------------------------------------------
+    match /advertisements/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /campaigns/{id} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    match /leads/{id} {
+      allow read: if isAdmin() || (isProviderRole() && isSignedIn() && resource.data.providerId == request.auth.uid);
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    // -------------------------------------------------------------------
+    // Support & platform administration
+    // -------------------------------------------------------------------
+    match /supportTickets/{id} {
+      allow read, create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read: if isStaff();
+      allow update: if isStaff();
+      allow delete: if false;
+    }
+
+    // Append-only audit log — no client writes at all (Route Handlers use
+    // Admin SDK, which bypasses these rules). Explicitly denies
+    // update/delete even for SUPER_ADMIN — an audit trail that can be
+    // edited isn't an audit trail.
+    match /auditLogs/{id} {
+      allow read: if isAdmin();
+      allow create: if false;
+      allow update, delete: if false;
+    }
+
+    match /settings/{key} {
+      allow read: if isStaff();
+      allow write: if isSuperAdmin(); // spec §44 — commission/fee config is SUPER_ADMIN only
+    }
+
+    // Default deny for anything not explicitly matched above.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
