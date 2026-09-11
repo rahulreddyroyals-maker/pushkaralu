@@ -12,8 +12,12 @@ export interface AdminNavSection {
 /**
  * Grouped by workflow area rather than one flat 20+ item list — matches
  * spec §25's module list, organized so the sidebar stays scannable.
- * Only `/admin` has a real page in Sprint 1; the rest are placeholder
- * hrefs reserved for the sprint that implements each module.
+ * Real pages exist for: Dashboard, Events, Ghats, Temples (Sprint 3),
+ * Hotels, Purohits, Businesses, Rituals (Sprint 4 — Businesses covers
+ * taxis/travel/boats/restaurants/local businesses/guides in one queue,
+ * see features/businesses/types.ts for why they share one collection).
+ * Everything else below is still a placeholder href reserved for the
+ * sprint that implements it.
  */
 export const ADMIN_NAV: AdminNavSection[] = [
   {
@@ -26,6 +30,7 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { label: "Events", href: "/admin/events", icon: "🗓️" },
       { label: "Ghats", href: "/admin/ghats", icon: "🌊" },
       { label: "Temples", href: "/admin/temples", icon: "🛕" },
+      { label: "Rituals", href: "/admin/rituals", icon: "🪔" },
       { label: "News", href: "/admin/news", icon: "📰" },
       { label: "SEO", href: "/admin/seo", icon: "🔍" },
     ],
@@ -35,8 +40,6 @@ export const ADMIN_NAV: AdminNavSection[] = [
     items: [
       { label: "Hotels", href: "/admin/hotels", icon: "🏨" },
       { label: "Purohits", href: "/admin/purohits", icon: "🙏" },
-      { label: "Transport", href: "/admin/transport", icon: "🚕" },
-      { label: "Boats", href: "/admin/boats", icon: "🛶" },
       { label: "Businesses", href: "/admin/businesses", icon: "🏬" },
       { label: "Bookings", href: "/admin/bookings", icon: "📖" },
       { label: "Payments", href: "/admin/payments", icon: "💳" },

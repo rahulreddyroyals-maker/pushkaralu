@@ -134,23 +134,29 @@ service cloud.firestore {
 
     // -------------------------------------------------------------------
     // Provider-owned listings — owner can manage their own, admin can
-    // manage any, everyone can read approved ones.
+    // manage any, everyone can read APPROVED ones (unapproved listings
+    // are visible only to their owner and staff — spec: "Admin must
+    // approve providers" + "do not expose private provider information
+    // unnecessarily").
     // -------------------------------------------------------------------
     match /hotels/{id} {
-      allow read: if true;
-      allow create: if isProviderRole();
+      allow read: if resource.data.approvalStatus == 'VERIFIED' || isAdmin() ||
+        (isSignedIn() && isOwner(resource.data.ownerId));
+      allow create: if isSignedIn();
       allow update, delete: if isAdmin() ||
         (isOwner(resource.data.ownerId) && isProviderRole());
     }
     match /purohits/{id} {
-      allow read: if true;
-      allow create: if isProviderRole();
+      allow read: if resource.data.approvalStatus == 'VERIFIED' || isAdmin() ||
+        (isSignedIn() && isOwner(resource.data.userId));
+      allow create: if isSignedIn();
       allow update, delete: if isAdmin() ||
         (isOwner(resource.data.userId) && isProviderRole());
     }
     match /boatOperators/{id} {
-      allow read: if true;
-      allow create: if isProviderRole();
+      allow read: if resource.data.approvalStatus == 'VERIFIED' || isAdmin() ||
+        (isSignedIn() && isOwner(resource.data.ownerId));
+      allow create: if isSignedIn();
       allow update, delete: if isAdmin() ||
         (isOwner(resource.data.ownerId) && isProviderRole());
     }
@@ -171,7 +177,8 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     match /businesses/{id} {
-      allow read: if true;
+      allow read: if resource.data.approvalStatus == 'VERIFIED' || isAdmin() ||
+        (isSignedIn() && isOwner(resource.data.ownerId));
       allow create: if isSignedIn(); // registration flow — Module 20
       allow update, delete: if isAdmin() ||
         (isOwner(resource.data.ownerId) && isProviderRole());

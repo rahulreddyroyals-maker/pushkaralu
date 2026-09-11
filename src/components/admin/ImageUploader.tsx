@@ -6,7 +6,7 @@ import { getFirebaseApp } from "@/lib/firebase/client";
 import { Button } from "@/components/ui";
 
 interface ImageUploaderProps {
-  entityType: "events" | "ghats" | "temples";
+  entityType: "events" | "ghats" | "temples" | "hotels" | "purohits" | "businesses";
   entityId: string;
   images: string[];
   onChange: (images: string[]) => void;

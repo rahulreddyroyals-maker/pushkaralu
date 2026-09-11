@@ -38,12 +38,35 @@ service firebase.storage {
       allow delete: if isStaff();
     }
 
-    // Provider-uploaded images (hotels, purohits, businesses) — deferred
-    // to the sprint that implements those modules; default-denied here
-    // until that ownership model exists, rather than left open.
-    match /images/providers/{providerId}/{fileName} {
+    // Provider-owned listing images (hotels, purohits, businesses) —
+    // Sprint 4. Staff can always manage them (moderation); the listing's
+    // own owner can too, verified via a cross-service Firestore read
+    // against that collection's ownership field. Public read, since
+    // these are displayed on public detail pages once approved (an
+    // unapproved listing's images aren't linked from anywhere public,
+    // but are technically fetchable by direct URL — acceptable, matches
+    // the same document-vs-UI privacy tradeoff noted in
+    // features/hotels/types.ts).
+    match /images/hotels/{hotelId}/{fileName} {
       allow read: if true;
-      allow write, delete: if false;
+      allow write: if isReasonableImage() && (isStaff() ||
+        (isSignedIn() && firestore.get(/databases/(default)/documents/hotels/$(hotelId)).data.ownerId == request.auth.uid));
+      allow delete: if isStaff() ||
+        (isSignedIn() && firestore.get(/databases/(default)/documents/hotels/$(hotelId)).data.ownerId == request.auth.uid);
+    }
+    match /images/purohits/{purohitId}/{fileName} {
+      allow read: if true;
+      allow write: if isReasonableImage() && (isStaff() ||
+        (isSignedIn() && firestore.get(/databases/(default)/documents/purohits/$(purohitId)).data.userId == request.auth.uid));
+      allow delete: if isStaff() ||
+        (isSignedIn() && firestore.get(/databases/(default)/documents/purohits/$(purohitId)).data.userId == request.auth.uid);
+    }
+    match /images/businesses/{businessId}/{fileName} {
+      allow read: if true;
+      allow write: if isReasonableImage() && (isStaff() ||
+        (isSignedIn() && firestore.get(/databases/(default)/documents/businesses/$(businessId)).data.ownerId == request.auth.uid));
+      allow delete: if isStaff() ||
+        (isSignedIn() && firestore.get(/databases/(default)/documents/businesses/$(businessId)).data.ownerId == request.auth.uid);
     }
 
     // Default deny for anything not explicitly matched above.

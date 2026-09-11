@@ -51,61 +51,71 @@ Sprint 3 — Event + Ghat + Temple Platform (COMPLETE, expanded scope)
           Businesses (Sprint 5/6 below) follow the same admin CRUD
           pattern established here
 
-Sprint 4 — Admin Module Screens (Events, Ghats, etc. wired to real data)
-  STATUS: folded into Sprint 3 above — no longer a separate sprint.
-  Delivers: the admin shell built in Sprint 1 gets real Event + Ghat
-            management screens instead of placeholder stat cards
-  Depends on: Sprint 2 (roles), Sprint 3 (ghat data model)
-  Blocks: every subsequent admin-managed module (5, 6, 7, 9)
-
-Sprint 5 — Purohit Directory (primary marketplace)
-  Delivers: purohit profiles, ritual catalog, public directory + detail
-            pages, admin verification screen
-  Depends on: Sprint 2 (roles — PUROHIT role), Sprint 4 (admin approval UI)
-  Blocks: Sprint 7 (bookings need at least one bookable provider type)
-
-Sprint 6 — Hotels + Business Registration
-  Delivers: hotel profiles, generic business registration flow + admin
-            approval queue
-  Depends on: Sprint 2, Sprint 4
-  Independent of Sprint 5 — could be reordered ahead of it
+Sprint 4 — Hotels, Purohits & Local Services Marketplace (COMPLETE, expanded scope)
+  Delivered: full data layer for Hotels, Purohits, Rituals (admin
+             catalog), and a generic categorized Businesses collection
+             (taxis/travel operators/boats/restaurants/local businesses/
+             guides — one collection, not six, see
+             features/businesses/types.ts). Search/filter/pagination on
+             every public listing page. Leads (inquiry mechanism) and
+             Reviews. Full provider-application → admin-approval →
+             role-grant pipeline via a shared assignRole() function.
+             Provider dashboard (create/edit own listing, view
+             inquiries). Admin approval queues for all three provider
+             types plus full rituals CRUD.
+  Depends on: Sprint 2 (roles — PROVIDER_ROLES, canManageOwnListing),
+              Sprint 3 (admin shell, ImageUploader, EntityActions pattern)
+  Blocks: Sprint 7 (bookings need at least one bookable provider type —
+          now satisfied)
+  Note: originally scoped as three separate sprints (5: Purohit
+        Directory, 6: Hotels + Business Registration) — delivered
+        together since they share the same approval/role-grant
+        machinery and splitting them would have meant building that
+        machinery three times. See docs/MARKETPLACE.md for the full
+        breakdown.
 
 Sprint 7 — Generic Booking Architecture + Reviews
-  Delivers: booking creation/status flow across provider types, review
-            submission tied to completed bookings
-  Depends on: Sprint 5 or 6 (needs at least one real provider type to book)
+  STATUS: Reviews delivered early as part of Sprint 4 (see above) —
+          Leads/inquiries serve as the interim "booking request"
+          mechanism spec Module 4 calls for, ahead of a real Booking
+          module with payment/status tracking.
+  Delivers: booking creation/status flow across provider types
+  Depends on: Sprint 4 (needs at least one real provider type to book —
+              now satisfied by Hotels/Purohits/Businesses)
   Blocks: Sprint 9 (commission/monetization needs bookings to exist)
 
 Sprint 8 — Mobile: Real Feature Screens
   Delivers: mobile Explore/Services/Bookings/Profile tabs replace their
             Sprint 1 placeholders, reusing web's features/<name>/api.ts
   Depends on: Sprint 2 (auth), and whichever web feature sprints have
-              shipped by this point
+              shipped by this point (Events/Ghats/Temples done, now
+              Hotels/Purohits/Businesses/Rituals too)
   Can run incrementally alongside web feature sprints rather than as one
   block, since the mobile shell already exists
 
 Sprint 9 — Emergency + Lost & Found + Family Safety
   Delivers: admin-managed emergency contacts, moderated lost&found
             reports, opt-in family location sharing
-  Depends on: Sprint 2 (auth), Sprint 4 (moderation queue pattern)
-  Independent of the marketplace sprints (5-7)
+  Depends on: Sprint 2 (auth), Sprint 3 (moderation queue pattern)
+  Independent of the marketplace sprints
 
 Sprint 10 — Advertising + Monetization Config
   Delivers: ad placement management, commission/fee settings screen
             (§44 settings collection), click/impression tracking
-  Depends on: Sprint 4 (admin shell wired to data), Sprint 7 (bookings
+  Depends on: Sprint 3 (admin shell wired to data), Sprint 7 (bookings
               exist to take commission from)
 
 Sprint 11 — AI Pilgrimage Assistant
   Delivers: tool-grounded assistant that queries live platform data
             (events, ghats, hotels) rather than generating from model
             knowledge alone
-  Depends on: Sprints 2-7 (needs real data to be tool-grounded against)
+  Depends on: Sprints 2-4 (needs real data to be tool-grounded against —
+              now satisfied)
 ```
 
 ## Critical Path
 
-`Sprint 0 → 1 (done) → 2 → 3 → 4 → (5 or 6) → 7 → 10`
+`Sprint 0 → 1 (done) → 2 (done) → 3 (done) → 4 (done) → 7 → 10`
 
 Sprints 8, 9, and 11 can be pulled forward or delayed relative to this
 spine without breaking dependencies.

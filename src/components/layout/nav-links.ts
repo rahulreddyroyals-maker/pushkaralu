@@ -34,6 +34,8 @@ export const FOOTER_COLUMNS: { title: string; links: NavLink[] }[] = [
       { label: "Travel & Taxis", href: ROUTES.travel },
       { label: "Boats", href: ROUTES.boats },
       { label: "Restaurants", href: ROUTES.restaurants },
+      { label: "Local Businesses", href: ROUTES.businesses },
+      { label: "Guides", href: ROUTES.guides },
     ],
   },
   {

@@ -4,12 +4,14 @@ Digital pilgrimage, tourism & services platform. Multi-event architecture
 (Godavari/Krishna/Tungabhadra Pushkaralu and beyond) — not hardcoded to a
 single event.
 
-## Status: Sprint 3 — Event, Ghat & Temple Platform
+## Status: Sprint 4 — Hotels, Purohits & Local Services Marketplace
 
-Auth (Sprint 2) and the full Event/Ghat/Temple platform (Sprint 3) are
-implemented — public browsing with search/filter/pagination, full admin
-CRUD with image management, and demo data. See
-`docs/EVENTS_GHATS_TEMPLES.md` for the full breakdown.
+Auth (Sprint 2), the Event/Ghat/Temple platform (Sprint 3), and the full
+provider marketplace (Sprint 4 — Hotels, Purohits, Rituals, and a
+categorized Businesses directory covering taxis/travel/boats/
+restaurants/local businesses/guides) are implemented, including the
+provider application → admin approval → role grant pipeline, inquiries,
+and reviews. See `docs/MARKETPLACE.md` for the full breakdown.
 
 ## Demo data
 
@@ -52,6 +54,8 @@ You'll need to create a Firebase project yourself and populate
   what's tested vs. what needs your machine to verify
 - `docs/EVENTS_GHATS_TEMPLES.md` — Sprint 3: data model, publish/unpublish,
   crowd status, search/pagination, maps, demo data, mobile
+- `docs/MARKETPLACE.md` — Sprint 4: provider approval pipeline, role
+  grants, the shared Businesses collection, privacy design
 - `docs/DATABASE_SCHEMA.md` — full Firestore collection design
 - `docs/DESIGN_SYSTEM.md` — color/type/signature-element rationale
 - `docs/ROUTE_MAP.md` — web routes, mobile navigation, admin routes

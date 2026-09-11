@@ -38,6 +38,7 @@ export const ROUTES = {
   tourism: "/tourism",
   packages: "/packages",
   businesses: "/businesses",
+  guides: "/guides",
   lostAndFound: "/lost-and-found",
   registerBusiness: "/register-business",
   about: "/about",
