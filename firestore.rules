@@ -192,20 +192,29 @@ service cloud.firestore {
     // Bookings / payments — never client-writable for payment state
     // -------------------------------------------------------------------
     match /bookings/{id} {
+      // NOTE: providerOwnerId (the provider's UID), not providerId (the
+      // LISTING's id) — Sprint 2's scaffold compared providerId against
+      // request.auth.uid, which could never match since those are
+      // different identifiers entirely. Bookings denormalize
+      // providerOwnerId at creation time precisely so this check works
+      // without a join (see features/bookings/types.ts).
       allow read: if isAdmin() ||
         (isSignedIn() && resource.data.userId == request.auth.uid) ||
-        (isProviderRole() && isSignedIn() && resource.data.providerId == request.auth.uid);
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      // Status transitions are business logic best enforced server-side
-      // (Cloud Function / Route Handler) once Module 18 ships — rules
-      // here only guard the read/create boundary for Sprint 2.
-      allow update: if isAdmin();
-      allow delete: if false;
+        (isSignedIn() && resource.data.providerOwnerId == request.auth.uid);
+      // Direct client creates are blocked: booking creation must go
+      // through /api/bookings so the commission snapshot and
+      // providerOwnerId lookup happen server-side and can't be forged
+      // by a client posting its own numbers.
+      allow create: if false;
+      // Status transitions are enforced server-side by the status
+      // machine (features/bookings/statusMachine.ts) via
+      // /api/bookings/[id]/status — never by direct client writes.
+      allow update, delete: if false;
     }
     match /payments/{id} {
       allow read: if isAdmin() ||
         (isSignedIn() && resource.data.userId == request.auth.uid);
-      allow write: if false; // written exclusively by server (webhook/Cloud Function)
+      allow write: if false; // written exclusively by server (webhook/Route Handler)
     }
 
     // -------------------------------------------------------------------

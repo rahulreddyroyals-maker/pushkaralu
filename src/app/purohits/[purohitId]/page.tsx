@@ -9,6 +9,7 @@ import { listReviews, getReviewAggregate } from "@/features/reviews/api";
 import { Breadcrumb, Card, Badge } from "@/components/ui";
 import { MapEmbed } from "@/components/ui/MapEmbed";
 import { LeadForm } from "@/components/marketplace/LeadForm";
+import { BookingForm } from "@/features/bookings/components/BookingForm";
 import { ReviewsSection } from "@/components/marketplace/ReviewsSection";
 import { ROUTES } from "@/config/app";
 
@@ -88,7 +89,8 @@ export default async function PurohitDetailPage({ params }: PageProps) {
           <MapEmbed location={purohit.location} label={purohit.name.en} />
         </div>
 
-        <div className="mt-8 max-w-md">
+        <div className="mt-8 grid max-w-3xl grid-cols-1 gap-6 sm:grid-cols-2">
+          <BookingForm providerId={purohit.id} providerType="purohit" />
           <LeadForm providerId={purohit.id} providerType="purohit" />
         </div>
 

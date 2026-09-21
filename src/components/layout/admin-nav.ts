@@ -42,7 +42,7 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { label: "Purohits", href: "/admin/purohits", icon: "🙏" },
       { label: "Businesses", href: "/admin/businesses", icon: "🏬" },
       { label: "Bookings", href: "/admin/bookings", icon: "📖" },
-      { label: "Payments", href: "/admin/payments", icon: "💳" },
+      { label: "Revenue", href: "/admin/revenue", icon: "💳" },
       { label: "Reviews", href: "/admin/reviews", icon: "⭐" },
     ],
   },

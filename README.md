@@ -4,14 +4,17 @@ Digital pilgrimage, tourism & services platform. Multi-event architecture
 (Godavari/Krishna/Tungabhadra Pushkaralu and beyond) — not hardcoded to a
 single event.
 
-## Status: Sprint 4 — Hotels, Purohits & Local Services Marketplace
+## Status: Sprint 5 — Booking, Leads & Monetization
 
 Auth (Sprint 2), the Event/Ghat/Temple platform (Sprint 3), and the full
 provider marketplace (Sprint 4 — Hotels, Purohits, Rituals, and a
 categorized Businesses directory covering taxis/travel/boats/
 restaurants/local businesses/guides) are implemented, including the
 provider application → admin approval → role grant pipeline, inquiries,
-and reviews. See `docs/MARKETPLACE.md` for the full breakdown.
+and reviews. Sprint 5 adds the booking system (status lifecycle,
+commission, Razorpay payment abstraction with signed webhooks) and
+configurable monetization. See `docs/MARKETPLACE.md` and
+`docs/BOOKINGS_MONETIZATION.md`.
 
 ## Demo data
 
@@ -56,6 +59,8 @@ You'll need to create a Firebase project yourself and populate
   crowd status, search/pagination, maps, demo data, mobile
 - `docs/MARKETPLACE.md` — Sprint 4: provider approval pipeline, role
   grants, the shared Businesses collection, privacy design
+- `docs/BOOKINGS_MONETIZATION.md` — Sprint 5: booking state machine,
+  commission snapshotting, payment abstraction, webhook security
 - `docs/DATABASE_SCHEMA.md` — full Firestore collection design
 - `docs/DESIGN_SYSTEM.md` — color/type/signature-element rationale
 - `docs/ROUTE_MAP.md` — web routes, mobile navigation, admin routes

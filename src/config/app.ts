@@ -39,6 +39,7 @@ export const ROUTES = {
   packages: "/packages",
   businesses: "/businesses",
   guides: "/guides",
+  bookings: "/bookings",
   lostAndFound: "/lost-and-found",
   registerBusiness: "/register-business",
   about: "/about",

@@ -2,18 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerUser } from "@/lib/auth/session";
 import { leadStatusUpdateSchema } from "@/features/leads/schemas";
 import { setLeadStatus } from "@/features/leads/api";
-import { getHotel } from "@/features/hotels/api";
-import { getPurohit } from "@/features/purohits/api";
-import { getBusiness } from "@/features/businesses/api";
+import { resolveListingOwnerId } from "@/features/leads/resolveOwner";
 import { isAdminRole } from "@/types/roles";
 import { getAdminDb } from "@/lib/firebase/admin";
-import type { LeadProviderType } from "@/features/leads/types";
-
-async function resolveListingOwnerId(providerType: LeadProviderType, providerId: string): Promise<string | null> {
-  if (providerType === "hotel") return (await getHotel(providerId, { includeUnverified: true }))?.ownerId ?? null;
-  if (providerType === "purohit") return (await getPurohit(providerId, { includeUnverified: true }))?.userId ?? null;
-  return (await getBusiness(providerId, { includeUnverified: true }))?.ownerId ?? null;
-}
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getServerUser();

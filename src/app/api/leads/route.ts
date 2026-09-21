@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerUser } from "@/lib/auth/session";
 import { leadInputSchema } from "@/features/leads/schemas";
 import { createLead, listLeadsForProvider } from "@/features/leads/api";
+import { resolveListingOwnerId } from "@/features/leads/resolveOwner";
 import { getAdminDb } from "@/lib/firebase/admin";
-import { getHotel } from "@/features/hotels/api";
-import { getPurohit } from "@/features/purohits/api";
-import { getBusiness } from "@/features/businesses/api";
 import { isAdminRole } from "@/types/roles";
 import type { LeadProviderType } from "@/features/leads/types";
 
@@ -32,12 +30,6 @@ export async function POST(req: NextRequest) {
 
   const id = await createLead(user.uid, displayName, parsed.data);
   return NextResponse.json({ ok: true, id }, { status: 201 });
-}
-
-async function resolveListingOwnerId(providerType: LeadProviderType, providerId: string): Promise<string | null> {
-  if (providerType === "hotel") return (await getHotel(providerId, { includeUnverified: true }))?.ownerId ?? null;
-  if (providerType === "purohit") return (await getPurohit(providerId, { includeUnverified: true }))?.userId ?? null;
-  return (await getBusiness(providerId, { includeUnverified: true }))?.ownerId ?? null;
 }
 
 /** GET ?providerId=&providerType= — the provider dashboard's "Inquiries" view. Only the listing's own owner (or an admin) can read its leads. */

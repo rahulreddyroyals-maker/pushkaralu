@@ -6,6 +6,7 @@ import { getHotel } from "@/features/hotels/api";
 import { Breadcrumb, Card, Badge } from "@/components/ui";
 import { MapEmbed } from "@/components/ui/MapEmbed";
 import { LeadForm } from "@/components/marketplace/LeadForm";
+import { BookingForm } from "@/features/bookings/components/BookingForm";
 import { ROUTES } from "@/config/app";
 
 export const dynamic = "force-dynamic";
@@ -82,7 +83,8 @@ export default async function HotelDetailPage({ params }: PageProps) {
           <MapEmbed location={hotel.location} label={hotel.name.en} />
         </div>
 
-        <div className="mt-8 max-w-md">
+        <div className="mt-8 grid max-w-3xl grid-cols-1 gap-6 sm:grid-cols-2">
+          <BookingForm providerId={hotel.id} providerType="hotel" suggestedAmount={hotel.priceRangeMin} />
           <LeadForm providerId={hotel.id} providerType="hotel" />
         </div>
       </div>
