@@ -1,24 +1,42 @@
-import { SiteShell } from "@/components/layout/SiteShell";
-import { listBusinesses } from "@/features/businesses/api";
+import { CatalogPageFrame, PageSection } from "@/components/catalog/CatalogPageFrame";
+import { CatalogListClient } from "@/components/catalog/CatalogListClient";
 import { BusinessListClient } from "@/features/businesses/components/BusinessListClient";
-import { Breadcrumb } from "@/components/ui";
-import { ROUTES } from "@/config/app";
+import { listBusinesses } from "@/features/businesses/api";
+import { loadPublicList } from "@/features/catalog/publicApi";
+import type { CatalogItem } from "@/features/catalog/cards";
+import { options } from "@/features/catalog/common";
+import { DIET_TYPES, DIET_TYPE_LABELS, PRICE_CATEGORIES, PRICE_CATEGORY_LABELS } from "@/features/restaurants/definition";
 
 export const dynamic = "force-dynamic";
 
-export default async function RestaurantsPage() {
-  const initial = await listBusinesses({ pageSize: 12, category: "restaurant" });
+export const metadata = {
+  title: "Restaurants & Food",
+  description: "Vegetarian, family and budget restaurants near the ghats with open/closed status.",
+};
 
+export default async function RestaurantsPage() {
+  const [initial, businesses] = await Promise.all([loadPublicList("restaurants"), listBusinesses({ pageSize: 12, category: "restaurant" })]);
   return (
-    <SiteShell>
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <Breadcrumb items={[{ label: "Home", href: ROUTES.home }, { label: "Restaurants" }]} />
-        <h1 className="mt-3 text-2xl font-semibold text-ink">Restaurants</h1>
-        <p className="mt-1 text-ink-muted">Vegetarian and family-friendly dining near the ghats.</p>
-        <div className="mt-8">
-          <BusinessListClient category="restaurant" initial={initial} />
-        </div>
-      </div>
-    </SiteShell>
+    <CatalogPageFrame
+      title="Restaurants & Food"
+      intro="Find vegetarian and family-friendly places to eat. Open/closed is worked out from each restaurant's published hours."
+      crumbs={[{ label: "Restaurants" }]}
+    >
+      <PageSection>
+        <CatalogListClient
+          catalogKey="restaurants"
+          noun="restaurants"
+          initial={{ items: initial.items as CatalogItem[], nextCursor: initial.nextCursor }}
+          filters={[
+            { key: "dietType", label: "Food type", options: options(DIET_TYPES, DIET_TYPE_LABELS) },
+            { key: "priceCategory", label: "Price", options: options(PRICE_CATEGORIES, PRICE_CATEGORY_LABELS) },
+            { key: "familyFriendly", label: "Family", options: [{ value: "true", label: "Family friendly" }] },
+          ]}
+        />
+      </PageSection>
+      <PageSection title="Registered local food businesses">
+        <BusinessListClient category="restaurant" initial={businesses} />
+      </PageSection>
+    </CatalogPageFrame>
   );
 }

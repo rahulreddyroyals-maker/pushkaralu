@@ -16,7 +16,8 @@ export interface AdminNavSection {
  * Hotels, Purohits, Businesses, Rituals (Sprint 4 — Businesses covers
  * taxis/travel/boats/restaurants/local businesses/guides in one queue,
  * see features/businesses/types.ts for why they share one collection).
- * Everything else below is still a placeholder href reserved for the
+ * Travel & Tourism (Sprint 6) pages are all driven by the shared catalog
+ * registry (features/catalog/registry.ts). Everything else below is still a placeholder href reserved for the
  * sprint that implements it.
  */
 export const ADMIN_NAV: AdminNavSection[] = [
@@ -44,6 +45,21 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { label: "Bookings", href: "/admin/bookings", icon: "📖" },
       { label: "Revenue", href: "/admin/revenue", icon: "💳" },
       { label: "Reviews", href: "/admin/reviews", icon: "⭐" },
+    ],
+  },
+  {
+    title: "Travel & Tourism",
+    items: [
+      { label: "Transport", href: "/admin/transport", icon: "🚕" },
+      { label: "Boat Operators", href: "/admin/boat-operators", icon: "⚓" },
+      { label: "Boats", href: "/admin/boats", icon: "🛶" },
+      { label: "Boat Routes", href: "/admin/boat-routes", icon: "🌊" },
+      { label: "Parking", href: "/admin/parking", icon: "🅿️" },
+      { label: "Restaurants", href: "/admin/restaurants", icon: "🍽️" },
+      { label: "Tourism", href: "/admin/tourism", icon: "🏞️" },
+      { label: "Itineraries", href: "/admin/itineraries", icon: "🗺️" },
+      { label: "Packages", href: "/admin/packages", icon: "🎒" },
+      { label: "Inquiries", href: "/admin/leads", icon: "💬" },
     ],
   },
   {

@@ -1,27 +1,44 @@
-import { SiteShell } from "@/components/layout/SiteShell";
-import { listBusinesses } from "@/features/businesses/api";
+import { CatalogPageFrame, PageSection } from "@/components/catalog/CatalogPageFrame";
+import { CatalogListClient } from "@/components/catalog/CatalogListClient";
 import { BusinessListClient } from "@/features/businesses/components/BusinessListClient";
-import { Breadcrumb } from "@/components/ui";
-import { ROUTES } from "@/config/app";
+import { listBusinesses } from "@/features/businesses/api";
+import { loadPublicList } from "@/features/catalog/publicApi";
+import type { CatalogItem } from "@/features/catalog/cards";
+import { TRANSPORT_KINDS, TRANSPORT_KIND_LABELS } from "@/features/transport/definition";
+import { options } from "@/features/catalog/common";
 
 export const dynamic = "force-dynamic";
 
-const CATEGORIES = ["taxi", "travel_operator"] as const;
+export const metadata = {
+  title: "Travel & Transport",
+  description: "Taxis, airport and railway transfers, buses, trains and local travel for pilgrims.",
+};
 
-/** Combines taxi + travel_operator categories under one public page — see spec's "Travel" nav entry (ROUTE_MAP.md). */
+const BUSINESS_CATEGORIES = ["taxi", "travel_operator"] as const;
+
 export default async function TravelPage() {
-  const initial = await listBusinesses({ pageSize: 12, category: [...CATEGORIES] });
+  const [transport, businesses] = await Promise.all([
+    loadPublicList("transport"),
+    listBusinesses({ pageSize: 12, category: [...BUSINESS_CATEGORIES] }),
+  ]);
 
   return (
-    <SiteShell>
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <Breadcrumb items={[{ label: "Home", href: ROUTES.home }, { label: "Travel" }]} />
-        <h1 className="mt-3 text-2xl font-semibold text-ink">Travel & Taxis</h1>
-        <p className="mt-1 text-ink-muted">Taxis and travel operators serving the pilgrimage route.</p>
-        <div className="mt-8">
-          <BusinessListClient category={[...CATEGORIES]} initial={initial} />
-        </div>
-      </div>
-    </SiteShell>
+    <CatalogPageFrame
+      title="Travel & Transport"
+      intro="Taxis, airport and railway transfers, buses, trains and local travel. Prices shown are indicative — confirm when you inquire."
+      crumbs={[{ label: "Travel" }]}
+    >
+      <PageSection>
+        <CatalogListClient
+          catalogKey="transport"
+          noun="transport options"
+          initial={{ items: transport.items as CatalogItem[], nextCursor: transport.nextCursor }}
+          filters={[{ key: "kind", label: "Type", options: options(TRANSPORT_KINDS, TRANSPORT_KIND_LABELS) }]}
+        />
+      </PageSection>
+      <PageSection title="Registered local operators">
+        <BusinessListClient category={[...BUSINESS_CATEGORIES]} initial={businesses} />
+      </PageSection>
+    </CatalogPageFrame>
   );
 }

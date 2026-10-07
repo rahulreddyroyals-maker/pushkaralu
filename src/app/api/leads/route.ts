@@ -5,7 +5,9 @@ import { createLead, listLeadsForProvider } from "@/features/leads/api";
 import { resolveListingOwnerId } from "@/features/leads/resolveOwner";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { isAdminRole } from "@/types/roles";
-import type { LeadProviderType } from "@/features/leads/types";
+import { CATALOG_LEAD_TARGETS, isCatalogLeadType, type LeadProviderType } from "@/features/leads/types";
+import { requireCatalogDefinition } from "@/features/catalog/registry";
+import { getCatalog } from "@/lib/catalog/server/repository";
 
 /**
  * The public "inquiry/booking request" mechanism (spec Module 4) —
@@ -22,6 +24,14 @@ export async function POST(req: NextRequest) {
   const parsed = leadInputSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid request", details: parsed.error.flatten() }, { status: 400 });
+  }
+
+  // Catalog targets must exist and be published — otherwise anyone could fill the admin queue with inquiries against random ids.
+  if (isCatalogLeadType(parsed.data.providerType)) {
+    const def = requireCatalogDefinition(CATALOG_LEAD_TARGETS[parsed.data.providerType].catalogKey);
+    if (!(await getCatalog(def, parsed.data.providerId))) {
+      return NextResponse.json({ error: "Listing not found" }, { status: 404 });
+    }
   }
 
   const db = getAdminDb();

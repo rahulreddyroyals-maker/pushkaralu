@@ -1,7 +1,7 @@
 import { getAdminDb } from "@/lib/firebase/admin";
 import { timestampToIso } from "@/lib/pagination";
 import { FieldValue, type QueryDocumentSnapshot, type DocumentData } from "firebase-admin/firestore";
-import type { Lead, LeadStatus } from "./types";
+import { CATALOG_LEAD_TYPES, type Lead, type LeadStatus } from "./types";
 import type { LeadInput } from "./schemas";
 
 function mapLeadDoc(doc: QueryDocumentSnapshot<DocumentData>): Lead {
@@ -56,4 +56,16 @@ export async function listLeadsForProvider(providerId: string, pageSize = 50): P
 export async function setLeadStatus(id: string, status: LeadStatus): Promise<void> {
   const db = getAdminDb();
   await db.collection("leads").doc(id).update({ status, updatedAt: FieldValue.serverTimestamp() });
+}
+
+/** Admin "Inquiries" queue for admin-managed catalog targets (transport, boat routes, packages). */
+export async function listCatalogLeads(pageSize = 100): Promise<Lead[]> {
+  const db = getAdminDb();
+  const snapshot = await db
+    .collection("leads")
+    .where("providerType", "in", [...CATALOG_LEAD_TYPES])
+    .orderBy("createdAt", "desc")
+    .limit(pageSize)
+    .get();
+  return snapshot.docs.map(mapLeadDoc);
 }

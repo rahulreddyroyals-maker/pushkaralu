@@ -6,7 +6,10 @@ import { getFirebaseApp } from "@/lib/firebase/client";
 import { Button } from "@/components/ui";
 
 interface ImageUploaderProps {
-  entityType: "events" | "ghats" | "temples" | "hotels" | "purohits" | "businesses";
+  entityType:
+    | "events" | "ghats" | "temples" | "hotels" | "purohits" | "businesses"
+    // Sprint 6 admin-managed catalogs (storage.rules must allow staff writes under images/{type}/**)
+    | "transport" | "boat-operators" | "boats" | "boat-routes" | "parking" | "restaurants" | "tourism" | "itineraries" | "packages";
   entityId: string;
   images: string[];
   onChange: (images: string[]) => void;

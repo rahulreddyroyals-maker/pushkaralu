@@ -22,6 +22,8 @@ export const FOOTER_COLUMNS: { title: string; links: NavLink[] }[] = [
       { label: "Ghats", href: ROUTES.ghats },
       { label: "Temples", href: ROUTES.temples },
       { label: "Tourism", href: ROUTES.tourism },
+      { label: "Itineraries", href: ROUTES.itineraries },
+      { label: "Travel Packages", href: ROUTES.packages },
       { label: "Events Calendar", href: ROUTES.events },
     ],
   },

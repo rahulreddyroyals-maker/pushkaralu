@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { LEAD_PROVIDER_TYPES, LEAD_STATUSES } from "./types";
+import { ALL_LEAD_TYPES, LEAD_STATUSES } from "./types";
 
 export const leadInputSchema = z.object({
   providerId: z.string().min(1),
-  providerType: z.enum(LEAD_PROVIDER_TYPES),
+  providerType: z.enum(ALL_LEAD_TYPES),
   userContactPhone: z.string().trim().min(6, "Enter a valid phone number"),
   message: z.string().trim().min(5, "Say a little about what you need").max(1000),
 });

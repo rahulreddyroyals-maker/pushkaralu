@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import { Button, Input, Card } from "@/components/ui";
 import { leadInputSchema } from "@/features/leads/schemas";
 import { useAuth } from "@/features/auth/AuthProvider";
-import type { LeadProviderType } from "@/features/leads/types";
+import type { AnyLeadType } from "@/features/leads/types";
 
 interface LeadFormProps {
   providerId: string;
-  providerType: LeadProviderType;
+  providerType: AnyLeadType;
+  /** Who follows up — "the provider" for owner-managed listings, "our team" for admin-managed catalog records. */
+  recipientLabel?: string;
 }
 
 /**
@@ -19,7 +21,7 @@ interface LeadFormProps {
  * prevent anonymous spam and because the provider needs a real contact
  * to call back.
  */
-export function LeadForm({ providerId, providerType }: LeadFormProps) {
+export function LeadForm({ providerId, providerType, recipientLabel = "the provider" }: LeadFormProps) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [phone, setPhone] = useState("");
@@ -43,7 +45,7 @@ export function LeadForm({ providerId, providerType }: LeadFormProps) {
   if (status === "sent") {
     return (
       <Card padding="md" className="text-center">
-        <p className="text-sm font-medium text-status-low">Inquiry sent — the provider will contact you directly.</p>
+        <p className="text-sm font-medium text-status-low">Inquiry sent — {recipientLabel} will contact you directly.</p>
       </Card>
     );
   }
@@ -79,7 +81,7 @@ export function LeadForm({ providerId, providerType }: LeadFormProps) {
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
         error={fieldErrors.userContactPhone}
-        placeholder="For the provider to call you back"
+        placeholder="For a call back"
       />
       <div>
         <label className="mb-1.5 block text-sm font-medium text-ink">Message</label>

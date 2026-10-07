@@ -37,6 +37,7 @@ export const ROUTES = {
   news: "/news",
   tourism: "/tourism",
   packages: "/packages",
+  itineraries: "/tourism/itineraries",
   businesses: "/businesses",
   guides: "/guides",
   bookings: "/bookings",
@@ -45,3 +46,11 @@ export const ROUTES = {
   about: "/about",
   contact: "/contact",
 } as const;
+
+/**
+ * Manually-entered operational status (parking, boat service) older than this
+ * is flagged "may be outdated" on public pages — manual data must never look live
+ * (spec Module 3). A display rule, not business data; the *times* shown always
+ * come from the record's own status-updated timestamp.
+ */
+export const MANUAL_STATUS_STALE_HOURS = 6;
