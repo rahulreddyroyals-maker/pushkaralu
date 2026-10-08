@@ -23,7 +23,7 @@ export type FieldDescriptor =
   | { type: "select"; name: string; label: string; options: { value: string; label: string }[] }
   | { type: "boolean"; name: string; label: string }
   | { type: "tags"; name: string; label: string; placeholder?: string; suggestions?: { value: string; label: string }[] }
-  | { type: "geo"; name: string; label: string }
+  | { type: "geo"; name: string; label: string; optional?: boolean }
   | { type: "images"; name: string; label: string }
   | { type: "seo"; name: string; label: string }
   /** Reference to another catalog (by registry key); options are loaded server-side and passed to the form. */

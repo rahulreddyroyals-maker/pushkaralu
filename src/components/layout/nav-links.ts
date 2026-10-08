@@ -46,6 +46,7 @@ export const FOOTER_COLUMNS: { title: string; links: NavLink[] }[] = [
       { label: "Emergency", href: ROUTES.emergency },
       { label: "Parking", href: ROUTES.parking },
       { label: "Lost & Found", href: ROUTES.lostAndFound },
+      { label: "Family Groups", href: ROUTES.family },
     ],
   },
   {

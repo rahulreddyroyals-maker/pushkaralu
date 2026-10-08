@@ -23,6 +23,7 @@ const VALID: Record<string, Record<string, unknown>> = {
     title: L("One day"), summary: L("s"), durationDays: 1, seo: SEO,
     days: [{ title: L("Day"), stops: [{ title: L("Stop"), time: "09:00" }] }],
   },
+  "emergency-services": { kind: "POLICE", name: L("Demo Control Room"), phone: "100", verifiedOn: "2026-01-01", verificationSource: "Called the control room" },
   packages: { title: L("Pkg"), summary: L("s"), description: L("d"), durationDays: 2, nights: 1, seo: SEO },
 };
 
@@ -42,9 +43,9 @@ describe("catalog registry", () => {
     expect(getCatalogDefinition("nope")).toBeUndefined();
   });
 
-  it("covers all nine Sprint 6 catalogs", () => {
+  it("covers all Sprint 6 catalogs plus the Sprint 7 emergency directory", () => {
     expect(CATALOG_DEFINITIONS.map((d) => d.key).sort()).toEqual(
-      ["boat-operators", "boat-routes", "boats", "itineraries", "packages", "parking", "restaurants", "tourism", "transport"]
+      ["boat-operators", "boat-routes", "boats", "emergency-services", "itineraries", "packages", "parking", "restaurants", "tourism", "transport"]
     );
   });
 

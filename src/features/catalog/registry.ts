@@ -1,6 +1,7 @@
 import type { CatalogDefinition } from "@/lib/catalog/types";
 import { transportDefinition } from "@/features/transport/definition";
 import { boatOperatorDefinition, boatDefinition, boatRouteDefinition } from "@/features/boats/definition";
+import { emergencyDefinition } from "@/features/emergency/definition";
 import { parkingDefinition } from "@/features/parking/definition";
 import { restaurantDefinition } from "@/features/restaurants/definition";
 import { tourismPlaceDefinition, itineraryDefinition, travelPackageDefinition } from "@/features/tourism/definition";
@@ -20,6 +21,7 @@ export const CATALOG_DEFINITIONS: CatalogDefinition[] = [
   tourismPlaceDefinition,
   itineraryDefinition,
   travelPackageDefinition,
+  emergencyDefinition,
 ];
 
 const BY_KEY = new Map(CATALOG_DEFINITIONS.map((d) => [d.key, d]));

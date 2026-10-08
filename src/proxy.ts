@@ -21,7 +21,7 @@ import { SESSION_COOKIE_NAME } from "@/lib/auth/constants";
  * redirected to /login immediately, instead of waiting for a server
  * round-trip that will redirect them anyway.
  */
-const PROTECTED_PREFIXES = ["/admin", "/profile"];
+const PROTECTED_PREFIXES = ["/admin", "/profile", "/family", "/lost-and-found/report", "/lost-and-found/mine"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -42,5 +42,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/profile/:path*"],
+  matcher: ["/admin/:path*", "/profile/:path*", "/family/:path*", "/lost-and-found/report", "/lost-and-found/mine"],
 };

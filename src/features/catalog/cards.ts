@@ -130,6 +130,10 @@ export function cardFor(catalogKey: string, item: CatalogItem, now: Date = new D
         price: p.priceFromInr === undefined ? "Price on request" : `From ${formatInr(p.priceFromInr)}`,
       };
     }
+    case "emergency-services": {
+      // Emergency entries have no detail pages — the dashboard is the surface. Card kept so admin/search can still list them.
+      return { href: "/emergency", title: pick((item as unknown as { name: { en: string } }).name) };
+    }
     default:
       return { href: "#", title: item.id };
   }

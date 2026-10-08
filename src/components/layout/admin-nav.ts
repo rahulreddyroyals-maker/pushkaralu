@@ -66,6 +66,7 @@ export const ADMIN_NAV: AdminNavSection[] = [
     title: "Safety & Operations",
     items: [
       { label: "Emergency", href: "/admin/emergency", icon: "🚑" },
+      { label: "Emergency Directory", href: "/admin/emergency-services", icon: "📞" },
       { label: "Lost & Found", href: "/admin/lost-and-found", icon: "🔎" },
       { label: "Notifications", href: "/admin/notifications", icon: "🔔" },
     ],

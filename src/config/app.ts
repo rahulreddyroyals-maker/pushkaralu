@@ -42,6 +42,7 @@ export const ROUTES = {
   guides: "/guides",
   bookings: "/bookings",
   lostAndFound: "/lost-and-found",
+  family: "/family",
   registerBusiness: "/register-business",
   about: "/about",
   contact: "/contact",
@@ -54,3 +55,26 @@ export const ROUTES = {
  * come from the record's own status-updated timestamp.
  */
 export const MANUAL_STATUS_STALE_HOURS = 6;
+
+/**
+ * Sprint 7 safety limits. These are abuse-prevention and privacy defaults
+ * (not business data): the numbers live here, in one place, so they are
+ * reviewed together rather than scattered through route handlers.
+ */
+export const SAFETY_LIMITS = {
+  /** Emergency directory entries whose verification is older than this show a "may be out of date" warning. */
+  emergencyReverifyDays: 30,
+  /** Lost & Found: reports one account may submit per rolling 24h. */
+  lostFoundReportsPerDay: 5,
+  /** Lost & Found: responses one account may send to a single report. */
+  lostFoundResponsesPerReport: 3,
+  /** Family: groups one account may own / members per group. */
+  familyGroupsPerOwner: 5,
+  familyMembersPerGroup: 15,
+  /** Family invite codes expire after this long. */
+  familyInviteTtlHours: 48,
+  /** Location sharing always has an end time; this is the longest a member may choose. */
+  familyMaxShareHours: 24,
+  /** Family emergency alerts one member may send per rolling hour. */
+  familyAlertsPerHour: 5,
+} as const;

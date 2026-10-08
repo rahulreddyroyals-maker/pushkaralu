@@ -127,7 +127,18 @@ export function FieldRenderer({ field, value, onChange, path, ctx }: FieldRender
       return <TagsField field={field} value={(value as string[] | undefined) ?? []} onChange={onChange} error={error} />;
 
     case "geo": {
-      const geo = (value as { latitude: number; longitude: number } | undefined) ?? { latitude: 0, longitude: 0 };
+      const geo = value as { latitude: number; longitude: number } | undefined;
+      if (field.optional && !geo) {
+        return (
+          <div>
+            <span className="mb-2 block text-sm font-medium text-ink">{field.label}</span>
+            <Button type="button" variant="outline" size="sm" onClick={() => onChange({ latitude: 16.9891, longitude: 81.7799 })}>
+              + Add a location
+            </Button>
+          </div>
+        );
+      }
+      const point = geo ?? { latitude: 0, longitude: 0 };
       return (
         <div>
           <span className="mb-2 block text-sm font-medium text-ink">{field.label}</span>
@@ -136,19 +147,25 @@ export function FieldRenderer({ field, value, onChange, path, ctx }: FieldRender
               label="Latitude"
               type="number"
               step="0.00001"
-              value={geo.latitude}
+              value={point.latitude}
               error={ctx.errors[`${path}.latitude`]}
-              onChange={(e) => onChange({ ...geo, latitude: Number(e.target.value) })}
+              onChange={(e) => onChange({ ...point, latitude: Number(e.target.value) })}
             />
             <Input
               label="Longitude"
               type="number"
               step="0.00001"
-              value={geo.longitude}
+              value={point.longitude}
               error={ctx.errors[`${path}.longitude`]}
-              onChange={(e) => onChange({ ...geo, longitude: Number(e.target.value) })}
+              onChange={(e) => onChange({ ...point, longitude: Number(e.target.value) })}
             />
           </div>
+          {field.optional && (
+            <Button type="button" variant="ghost" size="sm" className="mt-2" onClick={() => onChange(undefined)}>
+              Remove location
+            </Button>
+          )}
+          {error && <p className="mt-1 text-xs text-status-critical">{error}</p>}
         </div>
       );
     }
