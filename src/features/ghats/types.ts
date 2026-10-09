@@ -21,6 +21,9 @@ export const GHAT_FACILITY_LABELS: Record<GhatFacility, string> = {
   changing_rooms: "Changing rooms",
 };
 
+export const OPERATIONAL_STATUSES = ["OPEN", "CLOSED"] as const;
+export type OperationalStatus = (typeof OPERATIONAL_STATUSES)[number] | "UNKNOWN";
+
 /** events/{eventId}/ghats/{ghatId} — Spec Module 2 + 3. */
 export interface Ghat {
   id: string;
@@ -32,7 +35,15 @@ export interface Ghat {
   facilities: GhatFacility[];
   crowdStatus: CrowdStatus;
   crowdStatusUpdatedAt: string;
+  /** null = nobody has reported yet. The default "LOW" is then a placeholder, NOT a report, and must be shown as "not reported". */
   crowdStatusUpdatedBy: string | null;
+  /** Staff-estimated queue time. null/absent = not reported (never shown as 0). */
+  waitMinutes?: number | null;
+  /** UNKNOWN until staff say otherwise — a ghat is never shown "open" by default. */
+  operationalStatus: OperationalStatus;
+  /** Another ghat staff suggest while this one is crowded or closed (same event). */
+  alternativeGhatId?: string | null;
+  statusNote?: string;
   parkingInfo: LocalizedText;
   medicalInfo: LocalizedText;
   published: boolean;

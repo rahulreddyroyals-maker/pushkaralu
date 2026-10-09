@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerUser } from "@/lib/auth/session";
 import { createBookingInputSchema } from "@/features/bookings/schemas";
+import { notifyBooking } from "@/features/notifications/booking";
 import { createBooking, listBookingsForCustomer, listBookingsForProvider } from "@/features/bookings/api";
 import { resolveListingOwnerId } from "@/features/leads/resolveOwner";
 import { getAdminDb } from "@/lib/firebase/admin";
@@ -38,6 +39,7 @@ export async function POST(req: NextRequest) {
   const displayName = (profile.data()?.displayName as string | undefined) ?? "A pilgrim";
 
   const id = await createBooking(user.uid, displayName, providerOwnerId, parsed.data);
+  await notifyBooking({ kind: "CREATED" }, { id, userId: user.uid, providerOwnerId, serviceDate: parsed.data.serviceDate });
   return NextResponse.json({ ok: true, id }, { status: 201 });
 }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { razorpayProvider } from "@/lib/payments/razorpay";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { updateBookingPayment, updateBookingStatus } from "@/features/bookings/api";
+import { notifyBooking } from "@/features/notifications/booking";
 import { writeAuditLog } from "@/lib/audit/log";
 import { timestampToIso } from "@/lib/pagination";
 
@@ -54,6 +55,7 @@ export async function POST(req: NextRequest) {
   const doc = snapshot.docs[0];
   const booking = doc.data();
   const bookingId = doc.id;
+  const bookingRef = { id: bookingId, userId: booking.userId as string, providerOwnerId: booking.providerOwnerId as string, serviceDate: (booking.serviceDate as string) ?? "" };
 
   if (event.type === "payment.captured") {
     if (booking.paymentStatus === "PAID") {
@@ -72,6 +74,8 @@ export async function POST(req: NextRequest) {
       targetId: bookingId,
       metadata: { orderId: event.orderId, paymentId: event.paymentId },
     });
+    await notifyBooking({ kind: "PAYMENT_CAPTURED" }, bookingRef);
+    if (booking.status === "PENDING") await notifyBooking({ kind: "STATUS", status: "CONFIRMED", actor: "system" }, bookingRef);
     return NextResponse.json({ ok: true });
   }
 
@@ -84,6 +88,7 @@ export async function POST(req: NextRequest) {
       targetId: bookingId,
       metadata: { orderId: event.orderId },
     });
+    await notifyBooking({ kind: "PAYMENT_FAILED", orderId: event.orderId }, bookingRef);
     return NextResponse.json({ ok: true });
   }
 
@@ -96,6 +101,7 @@ export async function POST(req: NextRequest) {
       targetId: bookingId,
       metadata: { orderId: event.orderId, lastUpdated: timestampToIso(booking.updatedAt) },
     });
+    await notifyBooking({ kind: "REFUND_PROCESSED" }, bookingRef);
     return NextResponse.json({ ok: true });
   }
 

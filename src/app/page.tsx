@@ -17,7 +17,7 @@ export default async function Home() {
   const dict = await getDictionary(DEFAULT_LOCALE);
 
   const services = [
-    { href: ROUTES.ghats, icon: "🌊", label: "Ghats", description: "Live crowd status" },
+    { href: ROUTES.ghats, icon: "🌊", label: "Ghats", description: "Staff crowd updates" },
     { href: ROUTES.temples, icon: "🛕", label: "Temples", description: "History & timings" },
     { href: ROUTES.hotels, icon: "🏨", label: "Hotels", description: "Stay near the ghats" },
     { href: ROUTES.purohits, icon: "🙏", label: "Purohits", description: "Book ritual services" },

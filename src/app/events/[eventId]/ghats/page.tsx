@@ -28,7 +28,7 @@ export default async function GhatsPage({ params }: { params: Promise<{ eventId:
           ]}
         />
         <h1 className="mt-3 text-2xl font-semibold text-ink">Ghats — {event.name.en}</h1>
-        <p className="mt-1 text-ink-muted">Live crowd status, facilities, and parking for every ghat.</p>
+        <p className="mt-1 text-ink-muted">Crowd status reported by event staff (with the time of the last update), facilities, and parking for every ghat.</p>
 
         <div className="mt-8">
           <GhatListClient eventId={eventId} initial={initial} />

@@ -41,7 +41,7 @@ export default async function AdminGhatsForEventPage({ params }: { params: Promi
               <p className="mt-1 text-sm text-ink-muted">{ghat.facilities.length} facilities</p>
             </div>
             <div className="flex items-center gap-4">
-              <CrowdStatusBadge status={ghat.crowdStatus} updatedAt={ghat.crowdStatusUpdatedAt} />
+              <CrowdStatusBadge status={ghat.crowdStatus} updatedAt={ghat.crowdStatusUpdatedAt} reportedBy={ghat.crowdStatusUpdatedBy} operationalStatus={ghat.operationalStatus} />
               <EntityActions
                 published={ghat.published}
                 publishUrl={`/api/admin/events/${eventId}/ghats/${ghat.id}/publish-state`}

@@ -5,6 +5,7 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { getEvent } from "@/features/events/api";
 import { getGhat } from "@/features/ghats/api";
 import { Breadcrumb, Card, Badge } from "@/components/ui";
+import { FollowButton } from "@/components/notifications/FollowButton";
 import { CrowdStatusBadge } from "@/components/ui/CrowdStatusBadge";
 import { MapEmbed } from "@/components/ui/MapEmbed";
 import { GHAT_FACILITY_LABELS } from "@/features/ghats/types";
@@ -28,6 +29,8 @@ export default async function GhatDetailPage({ params }: PageProps) {
   const { eventId, ghatId } = await params;
   const [event, ghat] = await Promise.all([getEvent(eventId), getGhat(eventId, ghatId)]);
   if (!event || !ghat) notFound();
+  // Staff-suggested alternative: only shown if it still exists and is published.
+  const alternative = ghat.alternativeGhatId ? await getGhat(eventId, ghat.alternativeGhatId) : null;
 
   return (
     <SiteShell>
@@ -43,7 +46,20 @@ export default async function GhatDetailPage({ params }: PageProps) {
 
         <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
           <h1 className="text-3xl font-bold tracking-tight text-ink">{ghat.name.en}</h1>
-          <CrowdStatusBadge status={ghat.crowdStatus} updatedAt={ghat.crowdStatusUpdatedAt} />
+          <CrowdStatusBadge detailed status={ghat.crowdStatus} updatedAt={ghat.crowdStatusUpdatedAt} reportedBy={ghat.crowdStatusUpdatedBy} waitMinutes={ghat.waitMinutes} operationalStatus={ghat.operationalStatus} note={ghat.statusNote} />
+        </div>
+
+        {alternative && (
+          <div className="mt-4 rounded-lg border border-border bg-river-mist p-4 text-sm">
+            Staff suggest an alternative:{" "}
+            <a className="font-medium text-river-deep underline" href={`/events/${eventId}/ghats/${alternative.id}`}>
+              {alternative.name.en}
+            </a>
+          </div>
+        )}
+
+        <div className="mt-4">
+          <FollowButton kind="ghat" id={ghat.id} label="Get crowd alerts for this ghat" />
         </div>
 
         <p className="mt-4 text-ink-muted">{ghat.description.en}</p>

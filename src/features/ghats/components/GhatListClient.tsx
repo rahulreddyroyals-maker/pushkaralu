@@ -1,5 +1,6 @@
 "use client";
 
+import { CROWD_LABELS, relativeTime } from "@/features/ghats/crowd";
 import { useState, useTransition } from "react";
 import { LocationCard, Button, Select, EmptyState, ErrorState } from "@/components/ui";
 import { GHAT_FACILITIES, GHAT_FACILITY_LABELS, type Ghat } from "@/features/ghats/types";
@@ -83,12 +84,18 @@ export function GhatListClient({ eventId, initial }: GhatListClientProps) {
           {items.map((ghat) => (
             <LocationCard
               key={ghat.id}
-              href={`/ghats/${ghat.id}`}
+              href={`/events/${eventId}/ghats/${ghat.id}`}
               image={ghat.images[0]}
               title={ghat.name.en}
               subtitle={ghat.description.en}
-              badge={{ label: ghat.crowdStatus, tone: ghat.crowdStatus === "LOW" ? "success" : ghat.crowdStatus === "MODERATE" ? "warning" : "danger" }}
-              meta={`${ghat.facilities.length} facilities`}
+              badge={
+                ghat.crowdStatusUpdatedBy === null
+                  ? { label: "Crowd not reported", tone: "neutral" }
+                  : ghat.operationalStatus === "CLOSED"
+                    ? { label: "Closed", tone: "danger" }
+                    : { label: `${CROWD_LABELS[ghat.crowdStatus]} crowd`, tone: ghat.crowdStatus === "LOW" ? "success" : ghat.crowdStatus === "MODERATE" ? "warning" : "danger" }
+              }
+              meta={`${ghat.facilities.length} facilities${ghat.crowdStatusUpdatedBy === null ? "" : ` · updated ${relativeTime(ghat.crowdStatusUpdatedAt)}`}`}
             />
           ))}
         </div>

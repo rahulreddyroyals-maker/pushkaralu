@@ -9,6 +9,7 @@ const { getMock, updateBookingPaymentMock, updateBookingStatusMock, writeAuditLo
   writeAuditLogMock: vi.fn(),
 }));
 
+vi.mock("@/features/notifications/booking", () => ({ notifyBooking: vi.fn() }));
 vi.mock("@/lib/audit/log", () => ({ writeAuditLog: writeAuditLogMock }));
 vi.mock("@/features/bookings/api", () => ({
   updateBookingPayment: updateBookingPaymentMock,

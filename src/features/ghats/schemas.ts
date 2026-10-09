@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { localizedTextSchema } from "@/features/events/schemas";
-import { GHAT_FACILITIES } from "./types";
+import { GHAT_FACILITIES, OPERATIONAL_STATUSES } from "./types";
 
 export const ghatInputSchema = z.object({
   name: localizedTextSchema,
@@ -18,8 +18,16 @@ export const ghatInputSchema = z.object({
 
 export type GhatInput = z.infer<typeof ghatInputSchema>;
 
+/**
+ * One manual staff report. Omitted optional fields are left unchanged;
+ * `null` (or "" for the note) clears them. Wait time is never defaulted.
+ */
 export const crowdStatusUpdateSchema = z.object({
   crowdStatus: z.enum(["LOW", "MODERATE", "HIGH", "CRITICAL"]),
+  waitMinutes: z.number().int().min(0).max(720).nullable().optional(),
+  operationalStatus: z.enum(OPERATIONAL_STATUSES).optional(),
+  alternativeGhatId: z.string().trim().min(1).max(100).nullable().optional(),
+  statusNote: z.string().trim().max(200).optional(),
 });
 
 export type CrowdStatusUpdateInput = z.infer<typeof crowdStatusUpdateSchema>;

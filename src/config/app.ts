@@ -43,6 +43,7 @@ export const ROUTES = {
   bookings: "/bookings",
   lostAndFound: "/lost-and-found",
   family: "/family",
+  notifications: "/notifications",
   registerBusiness: "/register-business",
   about: "/about",
   contact: "/contact",
@@ -77,4 +78,28 @@ export const SAFETY_LIMITS = {
   familyMaxShareHours: 24,
   /** Family emergency alerts one member may send per rolling hour. */
   familyAlertsPerHour: 5,
+} as const;
+
+/**
+ * Sprint 8 notification behaviour. Like SAFETY_LIMITS these are delivery and
+ * abuse-prevention defaults (not business data), kept in one place.
+ */
+export const NOTIFY_LIMITS = {
+  /** Campaigns one staff account may create per rolling hour. */
+  campaignsPerActorPerHour: 20,
+  /** Recipients processed per batch, and batches a single request may run before leaving the rest to the scheduler. */
+  batchSize: 200,
+  inlineBatches: 3,
+  /** A claimed campaign is exclusive to one worker this long; after that another run may resume it. */
+  leaseSeconds: 120,
+  /** A campaign that throws this many times is marked FAILED instead of retrying forever. */
+  maxAttempts: 3,
+  /** Don't send the same crowd alert (same ghat + same level) again within this window. */
+  crowdAlertCooldownMinutes: 30,
+  /** Event reminders go out once, when an event is within this many hours of starting. */
+  eventReminderHoursBefore: [24],
+  maxTokensPerUser: 5,
+  maxFollowsPerUser: 50,
+  scheduleMaxDays: 365,
+  inboxPageSize: 20,
 } as const;

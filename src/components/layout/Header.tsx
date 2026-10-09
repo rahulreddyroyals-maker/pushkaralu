@@ -9,6 +9,7 @@ import { PRIMARY_NAV } from "./nav-links";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { RoleGate } from "@/components/auth/RoleGate";
 import { STAFF_ROLES } from "@/types/roles";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { signOutUser } from "@/features/auth/client";
 
 function AuthControls({ onNavigate }: { onNavigate?: () => void }) {
@@ -50,6 +51,7 @@ function AuthControls({ onNavigate }: { onNavigate?: () => void }) {
           </Button>
         </Link>
       </RoleGate>
+      <NotificationBell onNavigate={onNavigate} />
       <Link href="/profile" onClick={onNavigate}>
         <Button variant="ghost" size="sm" fullWidth>
           {user.displayName ?? "Profile"}

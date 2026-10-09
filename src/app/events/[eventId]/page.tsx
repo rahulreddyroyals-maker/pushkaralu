@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { getEvent, listAnnouncements } from "@/features/events/api";
 import { Breadcrumb, Badge, Card } from "@/components/ui";
+import { FollowButton } from "@/components/notifications/FollowButton";
 import { ROUTES } from "@/config/app";
 
 // force-dynamic — see src/app/events/page.tsx for why (build-time Admin SDK credential requirement).
@@ -46,6 +47,10 @@ export default async function EventDetailPage({ params }: PageProps) {
         <p className="mt-2 font-data text-sm text-ink-muted">
           {formatDate(event.startDate)} – {formatDate(event.endDate)} · {event.river}
         </p>
+
+        <div className="mt-4">
+          <FollowButton kind="event" id={event.id} label="Get reminders for this event" />
+        </div>
 
         <p className="mt-6 text-ink-muted">{event.description.en}</p>
 

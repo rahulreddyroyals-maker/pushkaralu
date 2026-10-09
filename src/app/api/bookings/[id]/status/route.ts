@@ -4,6 +4,7 @@ import { bookingStatusUpdateSchema } from "@/features/bookings/schemas";
 import { getBooking, updateBookingStatus } from "@/features/bookings/api";
 import { canTransitionBookingStatus, type BookingActor } from "@/features/bookings/statusMachine";
 import { isAdminRole } from "@/types/roles";
+import { notifyBooking } from "@/features/notifications/booking";
 import { writeAuditLog } from "@/lib/audit/log";
 
 /**
@@ -57,6 +58,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     targetId: id,
     metadata: { from: booking.status, to: parsed.data.status, actor },
   });
+  await notifyBooking(
+    { kind: "STATUS", status: parsed.data.status, actor },
+    { id, userId: booking.userId, providerOwnerId: booking.providerOwnerId, serviceDate: booking.serviceDate }
+  );
 
   return NextResponse.json({ ok: true });
 }

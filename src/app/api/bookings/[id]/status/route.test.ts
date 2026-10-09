@@ -9,6 +9,7 @@ const { getServerUserMock, getBookingMock, updateBookingStatusMock, writeAuditLo
 }));
 
 vi.mock("@/lib/auth/session", () => ({ getServerUser: getServerUserMock }));
+vi.mock("@/features/notifications/booking", () => ({ notifyBooking: vi.fn() }));
 vi.mock("@/lib/audit/log", () => ({ writeAuditLog: writeAuditLogMock }));
 vi.mock("@/features/bookings/api", () => ({
   getBooking: getBookingMock,

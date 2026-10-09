@@ -3,7 +3,6 @@ import { paginateQuery, timestampToIso, type PageResult } from "@/lib/pagination
 import { FieldValue, type QueryDocumentSnapshot, type DocumentData } from "firebase-admin/firestore";
 import type { Ghat, GhatFacility } from "./types";
 import type { GhatInput } from "./schemas";
-import type { CrowdStatus } from "@/types/domain";
 
 function mapGhatDoc(eventId: string) {
   return (doc: QueryDocumentSnapshot<DocumentData>): Ghat => {
@@ -19,6 +18,10 @@ function mapGhatDoc(eventId: string) {
       crowdStatus: data.crowdStatus ?? "LOW",
       crowdStatusUpdatedAt: timestampToIso(data.crowdStatusUpdatedAt),
       crowdStatusUpdatedBy: data.crowdStatusUpdatedBy ?? null,
+      waitMinutes: data.waitMinutes ?? null,
+      operationalStatus: data.operationalStatus ?? "UNKNOWN",
+      alternativeGhatId: data.alternativeGhatId ?? null,
+      statusNote: data.statusNote ?? "",
       parkingInfo: data.parkingInfo,
       medicalInfo: data.medicalInfo,
       published: data.published ?? false,
@@ -136,11 +139,11 @@ export async function deleteGhat(eventId: string, ghatId: string): Promise<void>
   await db.collection("events").doc(eventId).collection("ghats").doc(ghatId).delete();
 }
 
-/** Crowd status is updatable by MODERATOR+ (not full ADMIN-only) — see docs/ROLES_PERMISSIONS.md. Records who/when for the "Updated X ago, by staff" UI requirement (spec Module 3). */
-export async function updateCrowdStatus(eventId: string, ghatId: string, crowdStatus: CrowdStatus, updatedBy: string): Promise<void> {
+/** Persists one manual crowd report. `patch` holds only the fields to change (null clears). Records who/when — the "Updated X ago, by staff" requirement (spec Module 3). */
+export async function updateCrowdStatus(eventId: string, ghatId: string, patch: Record<string, unknown>, updatedBy: string): Promise<void> {
   const db = getAdminDb();
   await db.collection("events").doc(eventId).collection("ghats").doc(ghatId).update({
-    crowdStatus,
+    ...patch,
     crowdStatusUpdatedAt: FieldValue.serverTimestamp(),
     crowdStatusUpdatedBy: updatedBy,
     updatedAt: FieldValue.serverTimestamp(),
