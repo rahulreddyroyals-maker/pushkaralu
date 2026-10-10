@@ -24,6 +24,11 @@ const VALID: Record<string, Record<string, unknown>> = {
     days: [{ title: L("Day"), stops: [{ title: L("Stop"), time: "09:00" }] }],
   },
   "emergency-services": { kind: "POLICE", name: L("Demo Control Room"), phone: "100", verifiedOn: "2026-01-01", verificationSource: "Called the control room" },
+  articles: { slug: "demo-article", title: L("Demo"), body: L("Body text"), topic: "overview" },
+  "pilgrim-guides": { slug: "demo-guide", title: L("Demo"), body: L("Body text"), topic: "ghats" },
+  faqs: { slug: "demo-faq", title: L("Question?"), body: L("Answer."), topic: "dates" },
+  "location-pages": { slug: "demo-place", title: L("Demo"), body: L("Body text"), topic: "ghats", locationName: "Demo Ghat" },
+  "service-pages": { slug: "demo-service", title: L("Demo"), body: L("Body text"), topic: "hotels", ctaPath: "/hotels" },
   packages: { title: L("Pkg"), summary: L("s"), description: L("d"), durationDays: 2, nights: 1, seo: SEO },
 };
 
@@ -43,9 +48,9 @@ describe("catalog registry", () => {
     expect(getCatalogDefinition("nope")).toBeUndefined();
   });
 
-  it("covers all Sprint 6 catalogs plus the Sprint 7 emergency directory", () => {
+  it("covers Sprint 6 catalogs, the Sprint 7 emergency directory and Sprint 9 content", () => {
     expect(CATALOG_DEFINITIONS.map((d) => d.key).sort()).toEqual(
-      ["boat-operators", "boat-routes", "boats", "emergency-services", "itineraries", "packages", "parking", "restaurants", "tourism", "transport"]
+      ["articles", "boat-operators", "boat-routes", "boats", "emergency-services", "faqs", "itineraries", "location-pages", "packages", "parking", "pilgrim-guides", "restaurants", "service-pages", "tourism", "transport"]
     );
   });
 

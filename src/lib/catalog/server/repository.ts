@@ -93,6 +93,20 @@ export async function getCatalog(
   return mapCatalogDoc(def, publicView)(snapshot);
 }
 
+/** Look a record up by a unique field (the public `slug`). Published-only unless asked otherwise. */
+export async function getCatalogByField(
+  def: CatalogDefinition,
+  field: string,
+  value: string,
+  { includeUnpublished = false, publicView = false }: { includeUnpublished?: boolean; publicView?: boolean } = {}
+): Promise<StoredRecord | null> {
+  if (!value) return null;
+  let query = getAdminDb().collection(def.collection).where(field, "==", value) as FirebaseFirestore.Query;
+  if (!includeUnpublished) query = query.where("published", "==", true);
+  const snapshot = await query.limit(1).get();
+  return snapshot.empty ? null : mapCatalogDoc(def, publicView)(snapshot.docs[0]);
+}
+
 /** Batched lookup for resolving references (boat -> operator, package -> itinerary). Missing/unpublished ids are skipped. */
 export async function getCatalogMany(
   def: CatalogDefinition,
@@ -130,7 +144,20 @@ function defaultCanonical(def: CatalogDefinition, data: Record<string, unknown>,
   return { ...data, seo: { ...seo, canonicalPath: `${def.publicPath}/${id}` } };
 }
 
+/** Throws CatalogConflictError (-> 409) when another record already uses a unique field value. */
+export async function assertUnique(def: CatalogDefinition, input: Record<string, unknown>, selfId?: string): Promise<void> {
+  for (const field of def.uniqueFields ?? []) {
+    const value = input[field];
+    if (typeof value !== "string" || !value) continue;
+    const snap = await getAdminDb().collection(def.collection).where(field, "==", value).limit(2).get();
+    if (snap.docs.some((d) => d.id !== selfId)) {
+      throw new CatalogConflictError(`Another ${def.label.toLowerCase()} already uses the ${field} "${value}". Choose a different one.`);
+    }
+  }
+}
+
 export async function createCatalog(def: CatalogDefinition, input: Record<string, unknown>): Promise<string> {
+  await assertUnique(def, input);
   const ref = getAdminDb().collection(def.collection).doc();
   const stamps: Record<string, unknown> = {};
   for (const { field, stampField } of def.stampOnChange) {
@@ -147,6 +174,7 @@ export async function createCatalog(def: CatalogDefinition, input: Record<string
 }
 
 export async function updateCatalog(def: CatalogDefinition, id: string, input: Record<string, unknown>): Promise<void> {
+  await assertUnique(def, input, id);
   const ref = getAdminDb().collection(def.collection).doc(id);
   const existing = await ref.get();
   if (!existing.exists) throw new CatalogNotFoundError(def.label);

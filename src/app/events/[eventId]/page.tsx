@@ -6,6 +6,8 @@ import { getEvent, listAnnouncements } from "@/features/events/api";
 import { Breadcrumb, Badge, Card } from "@/components/ui";
 import { FollowButton } from "@/components/notifications/FollowButton";
 import { ROUTES } from "@/config/app";
+import { buildMetadata } from "@/lib/seo/metadata";
+import { eventSlug, hubPath } from "@/features/seoHub/hub";
 
 // force-dynamic — see src/app/events/page.tsx for why (build-time Admin SDK credential requirement).
 export const dynamic = "force-dynamic";
@@ -18,10 +20,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { eventId } = await params;
   const event = await getEvent(eventId);
   if (!event) return {};
-  return {
+  // The SEO hub page is the canonical home for this event; this app page points search engines there to avoid duplicates.
+  return buildMetadata({
     title: event.seo?.title?.en ?? event.name.en,
     description: event.seo?.description?.en ?? event.description.en,
-  };
+    path: hubPath(eventSlug(event)),
+    image: event.featuredImage,
+  });
 }
 
 function formatDate(iso: string) {

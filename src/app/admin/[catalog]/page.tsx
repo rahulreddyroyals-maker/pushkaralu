@@ -5,6 +5,7 @@ import { EntityActions } from "@/components/admin/EntityActions";
 import { getCatalogDefinition } from "@/features/catalog/registry";
 import { listCatalog } from "@/lib/catalog/server/repository";
 import { pick, formatRelativeTime } from "@/lib/catalog/format";
+import { isIndexable, MIN_INDEXABLE_WORDS, type ContentKey } from "@/lib/content/indexing";
 
 export const dynamic = "force-dynamic";
 
@@ -52,6 +53,14 @@ export default async function AdminCatalogListPage({
                   {typeof item.status === "string" && <Badge tone="info">{item.status}</Badge>}
                   {typeof item.kind === "string" && <Badge tone="neutral">{item.kind}</Badge>}
                 </div>
+                {def.slugRouted && typeof item.slug === "string" && (
+                  <p className="mt-1 text-xs text-ink-muted">
+                    <span className="font-data">{def.publicPath}/{item.slug}</span>
+                    {def.key in MIN_INDEXABLE_WORDS && !isIndexable(def.key as ContentKey, item as never, "en") && (
+                      <span className="ml-2 text-amber-700">Not indexed by search engines (noindex flag or fewer than {MIN_INDEXABLE_WORDS[def.key as ContentKey]} words)</span>
+                    )}
+                  </p>
+                )}
                 {statusUpdated && <p className="mt-1 text-xs text-ink-muted">Status updated {statusUpdated}</p>}
               </div>
               <EntityActions

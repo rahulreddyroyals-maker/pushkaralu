@@ -61,6 +61,10 @@ export interface CatalogDefinition {
   dependents: { collection: string; field: string; label: string }[];
   /** Server-side derived, queryable fields (e.g. trip type from duration). Never trusted from the client. */
   derive?: (data: Record<string, unknown>) => Record<string, unknown>;
+  /** Fields whose value must be unique within the collection (e.g. a public URL slug). Checked on create and update. */
+  uniqueFields?: string[];
+  /** Public detail pages are addressed by `slug` instead of the document id (Sprint 9 content). */
+  slugRouted?: boolean;
 }
 
 /** A stored catalog document as read back — `unknown` extras are narrowed per module via z.infer. */

@@ -33,7 +33,16 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { label: "Temples", href: "/admin/temples", icon: "🛕" },
       { label: "Rituals", href: "/admin/rituals", icon: "🪔" },
       { label: "News", href: "/admin/news", icon: "📰" },
-      { label: "SEO", href: "/admin/seo", icon: "🔍" },
+    ],
+  },
+  {
+    title: "Content & SEO",
+    items: [
+      { label: "Articles", href: "/admin/articles", icon: "📰" },
+      { label: "Pilgrim Guides", href: "/admin/pilgrim-guides", icon: "🧭" },
+      { label: "FAQs", href: "/admin/faqs", icon: "❓" },
+      { label: "Location Pages", href: "/admin/location-pages", icon: "📍" },
+      { label: "Service Pages", href: "/admin/service-pages", icon: "🛎️" },
     ],
   },
   {

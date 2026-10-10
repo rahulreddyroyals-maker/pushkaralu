@@ -41,6 +41,16 @@ export const FOOTER_COLUMNS: { title: string; links: NavLink[] }[] = [
     ],
   },
   {
+    title: "Learn",
+    links: [
+      { label: "Articles", href: ROUTES.articles },
+      { label: "Pilgrim Guides", href: ROUTES.pilgrimGuides },
+      { label: "FAQs", href: ROUTES.faqs },
+      { label: "Locations", href: ROUTES.locations },
+      { label: "Service Guides", href: ROUTES.services },
+    ],
+  },
+  {
     title: "Safety",
     links: [
       { label: "Emergency", href: ROUTES.emergency },

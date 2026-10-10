@@ -27,7 +27,7 @@ export function Footer() {
       </svg>
 
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-5">
           {FOOTER_COLUMNS.map((col) => (
             <div key={col.title}>
               <h3 className="text-sm font-semibold uppercase tracking-wide text-white/60">
