@@ -49,6 +49,7 @@ export const ROUTES = {
   lostAndFound: "/lost-and-found",
   family: "/family",
   notifications: "/notifications",
+  assistant: "/assistant",
   registerBusiness: "/register-business",
   about: "/about",
   contact: "/contact",
@@ -107,4 +108,18 @@ export const NOTIFY_LIMITS = {
   maxFollowsPerUser: 50,
   scheduleMaxDays: 365,
   inboxPageSize: 20,
+} as const;
+
+/**
+ * Sprint 10 assistant limits. Cost- and abuse-control defaults (not business data).
+ * Anonymous visitors get a smaller hourly allowance than signed-in users.
+ */
+export const AI_LIMITS = {
+  anonymousPerHour: 12,
+  signedInPerHour: 40,
+  maxTurnsPerRequest: 12,
+  maxCharsPerMessage: 1500,
+  maxCharsTotal: 8000,
+  maxToolRounds: 4,
+  maxToolCalls: 8,
 } as const;

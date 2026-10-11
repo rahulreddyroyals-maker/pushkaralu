@@ -7,6 +7,7 @@ export interface NavLink {
 
 /** Primary nav — kept short and high-intent for the header. Full directory lives in the footer. */
 export const PRIMARY_NAV: NavLink[] = [
+  { label: "Assistant", href: ROUTES.assistant },
   { label: "Ghats", href: ROUTES.ghats },
   { label: "Temples", href: ROUTES.temples },
   { label: "Hotels", href: ROUTES.hotels },
@@ -25,6 +26,7 @@ export const FOOTER_COLUMNS: { title: string; links: NavLink[] }[] = [
       { label: "Itineraries", href: ROUTES.itineraries },
       { label: "Travel Packages", href: ROUTES.packages },
       { label: "Events Calendar", href: ROUTES.events },
+      { label: "AI Assistant", href: ROUTES.assistant },
     ],
   },
   {

@@ -21,7 +21,7 @@ export const dynamic = "force-dynamic";
 const STATIC: string[] = [
   ROUTES.home, ROUTES.events, ROUTES.ghats, ROUTES.temples, ROUTES.hotels, ROUTES.purohits, ROUTES.rituals,
   ROUTES.travel, ROUTES.boats, ROUTES.restaurants, ROUTES.parking, ROUTES.tourism, ROUTES.packages, ROUTES.emergency,
-  ROUTES.guides, ROUTES.about, ROUTES.contact,
+  ROUTES.guides, ROUTES.about, ROUTES.contact, ROUTES.assistant,
   ...CONTENT_KEYS.map((k) => contentPath(k)),
 ];
 

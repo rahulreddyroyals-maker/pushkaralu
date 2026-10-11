@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { parseMarkdown, type Block, type Inline } from "@/lib/content/markdown";
 
-function renderInline(nodes: Inline[]): ReactNode[] {
+export function renderInline(nodes: Inline[]): ReactNode[] {
   return nodes.map((n, i) => {
     switch (n.t) {
       case "text":
