@@ -49,7 +49,8 @@ export async function chat(deps: AssistantDeps, actor: ChatActor | null, visitor
       tools: result.meta.toolNames, rounds: result.meta.rounds, verifiedItems: result.verified.length, removedSentences: result.meta.removed,
       safetyResponse: result.safetyResponse ?? false, inputTokens: result.meta.inputTokens ?? null, outputTokens: result.meta.outputTokens ?? null, latencyMs: Date.now() - started,
     }).catch((e) => console.error("[assistant] log failed", e));
-    const { meta: _meta, ...reply } = result;
+    const reply = { ...result } as Omit<typeof result, "meta"> & { meta?: unknown };
+    delete reply.meta; // internal diagnostics are logged above, never returned to the client
     return ok({ ...reply, remaining: decision.remaining });
   } catch (error) {
     if (error instanceof AiConfigError) console.error("[assistant] misconfigured:", error.message);

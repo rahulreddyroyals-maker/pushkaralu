@@ -20,6 +20,7 @@ export const metadata = {
  */
 export default async function EmergencyPage() {
   const results = await Promise.all(EMERGENCY_KINDS.map((kind) => loadPublicList("emergency-services", { pageSize: 24, filters: { kind } })));
+  // eslint-disable-next-line react-hooks/purity -- server component; evaluated once per request
   const nowMs = Date.now();
 
   return (

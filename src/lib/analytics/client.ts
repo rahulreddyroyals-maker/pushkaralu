@@ -11,7 +11,7 @@ import type { AnalyticsEventInput } from "./events";
  */
 type Outgoing = Partial<AnalyticsEventInput> & { type: AnalyticsEventInput["type"] };
 
-let queue: Outgoing[] = [];
+const queue: Outgoing[] = [];
 let timer: ReturnType<typeof setTimeout> | null = null;
 
 export function analyticsAllowed(): boolean {

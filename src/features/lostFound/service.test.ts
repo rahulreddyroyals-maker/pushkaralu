@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- test doubles intentionally bypass strict types */
 import { describe, it, expect, beforeEach } from "vitest";
 import { getReport, listMine, listPublic, moderate, moderationQueue, respond, listResponses, resolveReport, submitReport, toPublicView, type Deps } from "./service";
 import { createMemoryLostFoundStore } from "./memoryStore";

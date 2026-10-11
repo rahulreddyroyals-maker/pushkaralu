@@ -12,7 +12,7 @@ import { getSiteUrl } from "@/lib/seo/site";
 import { localizedPath, type SeoLang } from "@/lib/seo/paths";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { article as articleLd, faqPage } from "@/lib/seo/jsonld";
-import { metaDescription, readingMinutes } from "@/lib/seo/text";
+import { readingMinutes } from "@/lib/seo/text";
 import { markdownToPlainText, parseMarkdown, extractHeadings } from "@/lib/content/markdown";
 import { availableLangs, hasLanguage, isIndexable, pickLang, type ContentKey } from "@/lib/content/indexing";
 import { CONTENT_SECTIONS, contentPath } from "./sections";

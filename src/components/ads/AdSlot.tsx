@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- ad creatives are advertiser-hosted external images; next/image would need every ad host allow-listed */
 
 import { useEffect, useRef, useState } from "react";
 import { firstInSession, track } from "@/lib/analytics/client";
@@ -39,7 +40,7 @@ function AdItem({ ad, lang }: { ad: ServedAd; lang: "en" | "te" }) {
     return (
       <a {...common} className="block overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface-raised">
         <div className="flex items-center justify-between px-3 py-1">{label}</div>
-        {ad.image && /* eslint-disable-next-line @next/next/no-img-element */ <img src={ad.image} alt={ad.headline} loading="lazy" className="max-h-48 w-full object-cover" />}
+        {ad.image && <img src={ad.image} alt={ad.headline} loading="lazy" className="max-h-48 w-full object-cover" />}
         <p className="px-3 py-2 text-sm font-medium text-ink">{ad.headline}</p>
       </a>
     );
@@ -47,7 +48,7 @@ function AdItem({ ad, lang }: { ad: ServedAd; lang: "en" | "te" }) {
   if (ad.format === "HOMEPAGE_PROMOTION") {
     return (
       <a {...common} className="flex flex-col gap-2 rounded-[var(--radius-card)] border border-saffron/40 bg-surface-raised p-4 sm:flex-row sm:items-center">
-        {ad.image && /* eslint-disable-next-line @next/next/no-img-element */ <img src={ad.image} alt="" loading="lazy" className="h-24 w-full rounded-lg object-cover sm:w-40" />}
+        {ad.image && <img src={ad.image} alt="" loading="lazy" className="h-24 w-full rounded-lg object-cover sm:w-40" />}
         <div className="flex-1">
           {label}
           <p className="mt-1 text-lg font-semibold text-ink">{ad.headline}</p>
@@ -60,7 +61,7 @@ function AdItem({ ad, lang }: { ad: ServedAd; lang: "en" | "te" }) {
   // SPONSORED_LISTING / SPONSORED_ARTICLE — card styled like normal results but always labelled.
   return (
     <a {...common} className="flex gap-3 rounded-[var(--radius-card)] border border-border bg-surface-raised p-3">
-      {ad.creative?.image && /* eslint-disable-next-line @next/next/no-img-element */ <img src={ad.creative.image} alt="" loading="lazy" className="h-20 w-20 rounded-lg object-cover" />}
+      {ad.creative?.image && <img src={ad.creative.image} alt="" loading="lazy" className="h-20 w-20 rounded-lg object-cover" />}
       <div className="min-w-0">
         {label}
         <p className="mt-1 font-semibold text-ink">{ad.creative?.title ?? ad.headline}</p>

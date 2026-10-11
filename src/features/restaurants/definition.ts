@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { CatalogDefinition, CatalogRecord } from "@/lib/catalog/types";
 import {
-  localizedRequired, localizedOptional, geoSchema, hhmmSchema, inrSchema, seoSchema, imagesSchema, eventIdsSchema,
+  localizedRequired, geoSchema, hhmmSchema, inrSchema, seoSchema, imagesSchema, eventIdsSchema,
   DEFAULT_GEO, EMPTY_LOCALIZED, EMPTY_SEO, options, imagesField, seoField, eventIdsField, WEEKDAY_OPTIONS, WEEKDAY_VALUES,
 } from "@/features/catalog/common";
 

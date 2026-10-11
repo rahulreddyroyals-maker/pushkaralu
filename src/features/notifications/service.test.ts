@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- test doubles intentionally bypass strict types */
 import { describe, it, expect, beforeEach } from "vitest";
 import * as svc from "./service";
 import { createFakePush, createMemoryNotificationStore } from "./memoryStore";

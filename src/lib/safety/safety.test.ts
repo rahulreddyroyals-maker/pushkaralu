@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- test doubles intentionally bypass strict types */
 import { describe, it, expect } from "vitest";
 import { isPlausiblePhone, telHref } from "./phone";
 import { haversineMeters, sortByDistance } from "./geo";

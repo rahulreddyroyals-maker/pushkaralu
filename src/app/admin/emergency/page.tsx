@@ -27,6 +27,7 @@ export default async function AdminEmergencyPage() {
     listEscalatedAlerts(familyDeps, actor),
   ]);
 
+  // eslint-disable-next-line react-hooks/purity -- server component; evaluated once per request
   const now = Date.now();
   const isStale = (r: Record<string, unknown>) => {
     const t = Date.parse(String(r.verifiedOn ?? ""));

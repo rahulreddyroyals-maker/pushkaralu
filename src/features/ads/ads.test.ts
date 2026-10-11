@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { campaignTarget, effectiveStatus, estimatedSpend, selectCampaigns, type AdvertiserRec, type CampaignRec } from "./select";
+import { campaignTarget, effectiveStatus, estimatedSpend, selectCampaigns, type AdvertiserRec } from "./select";
 import { campaignSchema, placementSchema } from "./definitions";
 import { serveAds, registerClick, type AdData, type CampaignFull, type ServeDeps } from "./serve";
 import { createMemoryAnalyticsStore } from "@/features/analytics/store";

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, Card, Input, Select } from "@/components/ui";
 import { createReportSchema } from "@/features/lostFound/schemas";
@@ -65,7 +66,7 @@ export function ReportForm() {
     <Card padding="lg" className="flex flex-col gap-5">
       {urgent && (
         <p role="note" className="rounded-lg bg-[rgba(201,59,59,0.08)] p-3 text-sm text-ink">
-          If someone is missing or in danger, <a className="font-semibold text-status-critical underline" href="/emergency">call emergency services now</a>. Reports about people are reviewed first, but review is not instant.
+          If someone is missing or in danger, <Link className="font-semibold text-status-critical underline" href="/emergency">call emergency services now</Link>. Reports about people are reviewed first, but review is not instant.
         </p>
       )}
       <p className="text-sm text-ink-muted">
