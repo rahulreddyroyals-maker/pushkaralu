@@ -8,6 +8,7 @@ export function createProvider(config: AiConfig = readAiConfig()): LlmProvider {
   switch (config.provider) {
     case "anthropic":
       return createAnthropicProvider(config);
+    case "groq": // Groq speaks the OpenAI chat-completions protocol; config supplies its base URL
     case "openai":
       return createOpenAiProvider(config);
   }

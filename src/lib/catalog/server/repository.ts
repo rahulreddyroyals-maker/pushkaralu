@@ -60,6 +60,19 @@ function searchTerm(def: CatalogDefinition, data: Record<string, unknown>): stri
   return (title?.en ?? "").toLowerCase();
 }
 
+/** Firestore reports a missing composite index as code 9 with a console link. Log it where Vercel logs will show it, then rethrow unchanged. */
+async function withIndexHint<T>(collection: string, run: () => Promise<T>): Promise<T> {
+  try {
+    return await run();
+  } catch (e) {
+    const err = e as { code?: number | string; message?: string };
+    if (err?.code === 9 || String(err?.message ?? "").includes("requires an index")) {
+      console.error(`[firestore] MISSING INDEX for "${collection}" — run: firebase deploy --only firestore:indexes. ${err.message ?? ""}`);
+    }
+    throw e;
+  }
+}
+
 export async function listCatalog(def: CatalogDefinition, options: ListOptions = {}): Promise<PageResult<StoredRecord>> {
   const { pageSize = 12, cursor, includeUnpublished = false, search, filters = {}, publicView = false } = options;
   const map = mapCatalogDoc(def, publicView);
@@ -75,10 +88,10 @@ export async function listCatalog(def: CatalogDefinition, options: ListOptions =
 
   // Prefix search is a bounded, un-paginated read (same trade-off as Sprint 3 ghats/temples).
   if (term) {
-    const snapshot = await query.limit(pageSize).get();
+    const snapshot = await withIndexHint(def.collection, () => query.limit(pageSize).get());
     return { items: snapshot.docs.map(map), nextCursor: null };
   }
-  return paginateQuery<StoredRecord>(query, map, { pageSize, cursor });
+  return withIndexHint(def.collection, () => paginateQuery<StoredRecord>(query, map, { pageSize, cursor }));
 }
 
 export async function getCatalog(

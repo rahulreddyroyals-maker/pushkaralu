@@ -24,9 +24,9 @@ Language is detected from the message (falls back to the UI toggle). The system 
 ## Environment
 | Variable | Purpose |
 |---|---|
-| `AI_PROVIDER` | `anthropic` (default) or `openai` |
-| `AI_MODEL` | **required** model id from your provider console |
-| `AI_API_KEY` | key (or `ANTHROPIC_API_KEY` / `OPENAI_API_KEY`) — server only, never `NEXT_PUBLIC_` |
+| `AI_PROVIDER` | `groq` (default, free tier), `anthropic`, or `openai` |
+| `AI_MODEL` | model id; defaults to `llama-3.3-70b-versatile` for groq, required for others |
+| `AI_API_KEY` | key (or `GROQ_API_KEY` / `ANTHROPIC_API_KEY` / `OPENAI_API_KEY`) — server only, never `NEXT_PUBLIC_` |
 | `AI_BASE_URL` | optional gateway / compatible endpoint |
 | `AI_ENABLED` | `false` = kill switch |
 | `AI_TIMEOUT_MS` | default 30000 |

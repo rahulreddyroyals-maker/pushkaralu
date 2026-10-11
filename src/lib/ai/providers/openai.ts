@@ -47,7 +47,7 @@ export function fromOpenAiResponse(res: OpenAiResponse): GenerateResult {
 export function createOpenAiProvider(config: AiConfig): LlmProvider {
   const base = (config.baseUrl ?? "https://api.openai.com/v1").replace(/\/+$/, "");
   return {
-    name: "openai",
+    name: config.provider,
     model: config.model,
     async generate(req: GenerateRequest) {
       const body = {

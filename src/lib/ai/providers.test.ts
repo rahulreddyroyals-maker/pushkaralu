@@ -38,8 +38,10 @@ describe("provider adapters", () => {
 describe("readAiConfig", () => {
   it("requires key and model when enabled", () => {
     expect(() => readAiConfig({})).toThrow();
-    expect(() => readAiConfig({ AI_API_KEY: "k" })).toThrow();
-    expect(readAiConfig({ AI_API_KEY: "k", AI_MODEL: "m" })).toMatchObject({ provider: "anthropic", model: "m", enabled: true });
+    expect(() => readAiConfig({ AI_PROVIDER: "openai", AI_API_KEY: "k" })).toThrow(); // model has no default outside groq
+    expect(readAiConfig({ AI_API_KEY: "k", AI_MODEL: "m" })).toMatchObject({ provider: "groq", model: "m", enabled: true });
+    expect(readAiConfig({ GROQ_API_KEY: "g" })).toMatchObject({ provider: "groq", model: "llama-3.3-70b-versatile", baseUrl: "https://api.groq.com/openai/v1" });
+    expect(readAiConfig({ AI_PROVIDER: "anthropic", ANTHROPIC_API_KEY: "a", AI_MODEL: "m" }).provider).toBe("anthropic");
   });
   it("can be switched off and swapped by env alone", () => {
     expect(readAiConfig({ AI_ENABLED: "false" }).enabled).toBe(false);
