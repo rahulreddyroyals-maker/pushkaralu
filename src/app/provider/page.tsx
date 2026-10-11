@@ -35,6 +35,7 @@ export default async function ProviderDashboardPage() {
       <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
         <h1 className="text-2xl font-semibold text-ink">Provider Dashboard</h1>
         <p className="mt-1 text-ink-muted">Manage your listings, photos, and inquiries.</p>
+        <Link href="/provider/analytics" className="mt-2 inline-block text-sm text-river-current hover:underline">View analytics (views, clicks, leads, bookings) →</Link>
 
         {!hasAnyListing && (
           <div className="mt-8">

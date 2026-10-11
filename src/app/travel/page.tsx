@@ -1,3 +1,4 @@
+import { AdSlot } from "@/components/ads/AdSlot";
 import { CatalogPageFrame, PageSection } from "@/components/catalog/CatalogPageFrame";
 import { CatalogListClient } from "@/components/catalog/CatalogListClient";
 import { BusinessListClient } from "@/features/businesses/components/BusinessListClient";
@@ -28,6 +29,7 @@ export default async function TravelPage() {
       intro="Taxis, airport and railway transfers, buses, trains and local travel. Prices shown are indicative — confirm when you inquire."
       crumbs={[{ label: "Travel" }]}
     >
+      <AdSlot placement="listings_top" className="mb-6" />
       <PageSection>
         <CatalogListClient
           catalogKey="transport"

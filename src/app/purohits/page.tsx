@@ -1,3 +1,4 @@
+import { AdSlot } from "@/components/ads/AdSlot";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { listPurohits } from "@/features/purohits/api";
 import { PurohitListClient } from "@/features/purohits/components/PurohitListClient";
@@ -15,6 +16,8 @@ export default async function PurohitsPage() {
         <Breadcrumb items={[{ label: "Home", href: ROUTES.home }, { label: "Purohits" }]} />
         <h1 className="mt-3 text-2xl font-semibold text-ink">Purohit Directory</h1>
         <p className="mt-1 text-ink-muted">Verified purohits for rituals — languages, experience, and pricing.</p>
+
+        <AdSlot placement="listings_top" className="mt-6" />
 
         <div className="mt-8">
           <PurohitListClient initial={initial} />

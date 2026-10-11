@@ -4,6 +4,7 @@ import { APP_NAME, DEFAULT_SEO } from "@/config/app";
 import { getSiteUrl } from "@/lib/seo/site";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { organization, webSite } from "@/lib/seo/jsonld";
+import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
 import { AuthProvider } from "@/features/auth/AuthProvider";
 
 /**
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col font-sans">
         <JsonLd data={[webSite(APP_NAME), organization(APP_NAME)]} />
+        <AnalyticsTracker />
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

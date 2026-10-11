@@ -41,5 +41,5 @@ export function buildSitemap(inputs: SitemapInput[], siteUrl?: string): SitemapE
 /** Path prefixes that must never be crawled: private, transactional, or API. */
 export const DISALLOWED_PATHS = [
   "/admin", "/api/", "/profile", "/provider", "/bookings", "/family", "/notifications",
-  "/lost-and-found/report", "/lost-and-found/mine", "/login", "/register",
+  "/lost-and-found/report", "/lost-and-found/mine", "/login", "/register", "/r/",
 ];

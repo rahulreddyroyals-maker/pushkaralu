@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils/cn";
 import { useState, type FormEvent } from "react";
+import { track } from "@/lib/analytics/client";
 
 interface SearchBarProps {
   placeholder?: string;
@@ -26,6 +27,7 @@ export function SearchBar({
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (value.trim()) track({ type: "search", term: value.trim() });
     onSearch?.(value.trim());
   }
 

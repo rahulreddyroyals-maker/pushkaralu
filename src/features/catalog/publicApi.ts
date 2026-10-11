@@ -1,7 +1,15 @@
 import "server-only";
-import { requireCatalogDefinition } from "@/features/catalog/registry";
+import { requireCatalogDefinition as requireAny } from "@/features/catalog/registry";
+
 import { getCatalog, getCatalogMany, listCatalog, listCatalogBy, type ListOptions, type StoredRecord } from "@/lib/catalog/server/repository";
 import type { PageResult } from "@/lib/pagination";
+
+/** Public reads can never reach admin-only catalogs (advertising budgets, advertiser contacts). */
+function requireCatalogDefinition(key: string) {
+  const def = requireAny(key);
+  if (def.adminOnly) throw new Error(`Catalog ${key} is not public`);
+  return def;
+}
 
 /**
  * Server-side reads for the public pages. Always published-only and

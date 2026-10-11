@@ -1,3 +1,4 @@
+import { AdSlot } from "@/components/ads/AdSlot";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -77,6 +78,7 @@ export async function ContentListPage({ sectionKey, lang }: { sectionKey: Conten
         <SeoBreadcrumbs items={[{ label: HOME[lang], href: localizedPath("/", lang) }, { label: section.label[lang] }]} />
         <h1 className="mt-4 text-3xl font-bold tracking-tight text-ink">{section.label[lang]}</h1>
         <p className="mt-2 text-ink-muted">{section.intro[lang]}</p>
+        {sectionKey === "articles" && <AdSlot placement="articles_featured" lang={lang} className="mt-6" />}
 
         {visible.length === 0 && <div className="mt-8"><EmptyState title={t.empty} description={t.emptyDesc} /></div>}
 
@@ -163,7 +165,14 @@ export async function ContentDetailPage({ sectionKey, slug, lang }: { sectionKey
           </nav>
         )}
 
-        <Markdown source={text.body} />
+        {rec.sponsoredBy && (
+          <p className="mt-4 rounded-md border border-border bg-river-mist px-3 py-2 text-sm text-ink-muted">
+            {lang === "te" ? "ప్రాయోజిత కంటెంట్" : "Sponsored content"} — {rec.sponsoredBy}
+          </p>
+        )}
+
+        <Markdown source={text.body} sponsored={Boolean(rec.sponsoredBy)} />
+        <AdSlot placement="content_inline" lang={lang} className="mt-8" />
 
         {sectionKey === "service-pages" && rec.ctaPath && (
           <div className="mt-8">

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { shareTargets } from "@/lib/seo/share";
+import { track } from "@/lib/analytics/client";
 
 interface ShareButtonsProps {
   title: string;
@@ -19,6 +20,7 @@ export function ShareButtons({ title, path, siteUrl, labels = EN }: ShareButtons
   const { url, whatsapp, facebook } = shareTargets(title, path, siteUrl);
 
   async function copy() {
+    track({ type: "share", action: "copy", label: title });
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
@@ -32,8 +34,8 @@ export function ShareButtons({ title, path, siteUrl, labels = EN }: ShareButtons
   return (
     <div className="flex flex-wrap items-center gap-2" aria-label={labels.share}>
       <span className="text-sm text-ink-muted">{labels.share}:</span>
-      <a className={btn} href={whatsapp} target="_blank" rel="noopener noreferrer">{labels.whatsapp}</a>
-      <a className={btn} href={facebook} target="_blank" rel="noopener noreferrer">{labels.facebook}</a>
+      <a className={btn} href={whatsapp} target="_blank" rel="noopener noreferrer" onClick={() => track({ type: "share", action: "whatsapp", label: title })}>{labels.whatsapp}</a>
+      <a className={btn} href={facebook} target="_blank" rel="noopener noreferrer" onClick={() => track({ type: "share", action: "facebook", label: title })}>{labels.facebook}</a>
       <button type="button" className={btn} onClick={copy}>{copied ? labels.copied : labels.copy}</button>
       <span role="status" aria-live="polite" className="sr-only">{copied ? labels.copied : ""}</span>
     </div>

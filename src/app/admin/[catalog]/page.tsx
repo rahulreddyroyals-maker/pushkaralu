@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { requireCatalogAccess } from "@/lib/catalog/server/access";
 import { Card, Badge, Button, EmptyState } from "@/components/ui";
 import { EntityActions } from "@/components/admin/EntityActions";
 import { getCatalogDefinition } from "@/features/catalog/registry";
@@ -22,6 +23,7 @@ export default async function AdminCatalogListPage({
   const { cursor } = await searchParams;
   const def = getCatalogDefinition(catalog);
   if (!def) notFound();
+  await requireCatalogAccess(def);
 
   const { items, nextCursor } = await listCatalog(def, { pageSize: PAGE_SIZE, cursor, includeUnpublished: true });
 

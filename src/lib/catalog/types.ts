@@ -63,6 +63,8 @@ export interface CatalogDefinition {
   derive?: (data: Record<string, unknown>) => Record<string, unknown>;
   /** Fields whose value must be unique within the collection (e.g. a public URL slug). Checked on create and update. */
   uniqueFields?: string[];
+  /** Holds private business data (budgets, contacts): no public API, and the admin screens require an ADMIN role (editors are excluded). */
+  adminOnly?: boolean;
   /** Public detail pages are addressed by `slug` instead of the document id (Sprint 9 content). */
   slugRouted?: boolean;
 }

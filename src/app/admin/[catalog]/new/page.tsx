@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { requireCatalogAccess } from "@/lib/catalog/server/access";
 import { CatalogEntityForm } from "@/components/catalog/CatalogEntityForm";
 import { getCatalogDefinition } from "@/features/catalog/registry";
 import { loadRefOptions } from "@/lib/catalog/server/refOptions";
@@ -9,6 +10,7 @@ export default async function NewCatalogRecordPage({ params }: { params: Promise
   const { catalog } = await params;
   const def = getCatalogDefinition(catalog);
   if (!def) notFound();
+  await requireCatalogAccess(def);
   const refOptions = await loadRefOptions(def);
 
   return (

@@ -29,6 +29,12 @@ const VALID: Record<string, Record<string, unknown>> = {
   faqs: { slug: "demo-faq", title: L("Question?"), body: L("Answer."), topic: "dates" },
   "location-pages": { slug: "demo-place", title: L("Demo"), body: L("Body text"), topic: "ghats", locationName: "Demo Ghat" },
   "service-pages": { slug: "demo-service", title: L("Demo"), body: L("Body text"), topic: "hotels", ctaPath: "/hotels" },
+  advertisers: { name: L("Acme Stays"), status: "ACTIVE" },
+  "ad-campaigns": {
+    title: L("Diwali offer"), advertiserId: "adv1", format: "HOMEPAGE_PROMOTION", placement: "home_featured", status: "DRAFT", startDate: "2026-10-01", endDate: "2026-10-31",
+    budgetInr: 500, pricingModel: "FLAT", weight: 5, headline: { en: "Stay near the ghats", te: "" }, targetPath: "/hotels",
+  },
+  "ad-placements": { placementKey: "home_hero", name: { en: "Home hero", te: "" }, enabled: true, maxItems: 1 },
   packages: { title: L("Pkg"), summary: L("s"), description: L("d"), durationDays: 2, nights: 1, seo: SEO },
 };
 
@@ -48,9 +54,9 @@ describe("catalog registry", () => {
     expect(getCatalogDefinition("nope")).toBeUndefined();
   });
 
-  it("covers Sprint 6 catalogs, the Sprint 7 emergency directory and Sprint 9 content", () => {
+  it("covers Sprint 6 catalogs, the Sprint 7 emergency directory, Sprint 9 content and Sprint 11 advertising", () => {
     expect(CATALOG_DEFINITIONS.map((d) => d.key).sort()).toEqual(
-      ["articles", "boat-operators", "boat-routes", "boats", "emergency-services", "faqs", "itineraries", "location-pages", "packages", "parking", "pilgrim-guides", "restaurants", "service-pages", "tourism", "transport"]
+      ["ad-campaigns", "ad-placements", "advertisers", "articles", "boat-operators", "boat-routes", "boats", "emergency-services", "faqs", "itineraries", "location-pages", "packages", "parking", "pilgrim-guides", "restaurants", "service-pages", "tourism", "transport"]
     );
   });
 
@@ -189,5 +195,16 @@ describe("cardFor", () => {
 
   it("boat card links to its operator (no standalone boat page)", () => {
     expect(cardFor("boats", { ...base, ...VALID.boats } as unknown as CatalogItem).href).toBe("/boats/operators/op1");
+  });
+});
+
+describe("admin-only catalogs (advertising)", () => {
+  it("are flagged adminOnly so they get no public API, and nothing else is", () => {
+    const adminOnly = CATALOG_DEFINITIONS.filter((d) => d.adminOnly).map((d) => d.key).sort();
+    expect(adminOnly).toEqual(["ad-campaigns", "ad-placements", "advertisers"]);
+  });
+  it("advertiser contact details and notes are private fields", () => {
+    const adv = requireCatalogDefinition("advertisers");
+    for (const f of ["ownerUid", "contactName", "contactPhone", "contactEmail", "notes"]) expect(adv.privateFields).toContain(f);
   });
 });

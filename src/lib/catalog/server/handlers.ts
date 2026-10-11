@@ -109,6 +109,8 @@ export async function adminSetPublished(req: NextRequest, catalog: string, id: s
 export async function publicList(req: NextRequest, catalog: string): Promise<NextResponse> {
   const def = resolve(catalog);
   if (def instanceof NextResponse) return def;
+  // Admin-only catalogs (advertising) hold budgets and contacts — they look like an unknown catalog to the public.
+  if (def.adminOnly) return NextResponse.json({ error: "Unknown catalog" }, { status: 404 });
   const params = req.nextUrl.searchParams;
 
   const requested = Number(params.get("pageSize"));

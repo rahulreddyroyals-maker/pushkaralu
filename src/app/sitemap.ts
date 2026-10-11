@@ -65,7 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Id-routed catalog details (parking, transport, restaurants, tourism, boats…). Emergency + CMS definitions are handled elsewhere/excluded.
   for (const def of CATALOG_DEFINITIONS) {
-    if (def.slugRouted || def.key === "emergency-services") continue;
+    if (def.slugRouted || def.adminOnly || def.key === "emergency-services") continue;
     const page = await safe(`catalog ${def.key}`, async () => (await listCatalog(def, { pageSize: 100, publicView: true })).items);
     for (const r of page) inputs.push({ path: `${def.publicPath}/${r.id}`, lastModified: r.updatedAt, changeFrequency: "weekly", priority: 0.5 });
   }

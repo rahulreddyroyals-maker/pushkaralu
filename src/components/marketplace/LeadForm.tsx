@@ -74,6 +74,7 @@ export function LeadForm({ providerId, providerType, recipientLabel = "the provi
   }
 
   return (
+    <div data-track-start="inquiry">
     <Card padding="md" className="flex flex-col gap-3">
       <h3 className="font-semibold text-ink">Send an inquiry</h3>
       <Input
@@ -99,5 +100,6 @@ export function LeadForm({ providerId, providerType, recipientLabel = "the provi
         {status === "submitting" ? "Sending..." : "Send inquiry"}
       </Button>
     </Card>
+    </div>
   );
 }

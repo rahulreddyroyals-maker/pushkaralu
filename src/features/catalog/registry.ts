@@ -4,6 +4,7 @@ import { boatOperatorDefinition, boatDefinition, boatRouteDefinition } from "@/f
 import { emergencyDefinition } from "@/features/emergency/definition";
 import { parkingDefinition } from "@/features/parking/definition";
 import { restaurantDefinition } from "@/features/restaurants/definition";
+import { AD_DEFINITIONS } from "@/features/ads/definitions";
 import { CONTENT_DEFINITIONS } from "@/features/content/definitions";
 import { tourismPlaceDefinition, itineraryDefinition, travelPackageDefinition } from "@/features/tourism/definition";
 
@@ -24,6 +25,7 @@ export const CATALOG_DEFINITIONS: CatalogDefinition[] = [
   travelPackageDefinition,
   emergencyDefinition,
   ...CONTENT_DEFINITIONS,
+  ...AD_DEFINITIONS,
 ];
 
 const BY_KEY = new Map(CATALOG_DEFINITIONS.map((d) => [d.key, d]));

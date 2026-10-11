@@ -55,7 +55,7 @@ const base = {
   availableForEvents: eventIdsSchema,
 };
 
-export const articleSchema = z.object({ ...base, authorName: z.string().trim().max(80).optional().or(z.literal("")), tags: z.array(z.string().trim().min(1)).default([]) });
+export const articleSchema = z.object({ ...base, sponsoredBy: z.string().trim().max(120).optional().or(z.literal("")), authorName: z.string().trim().max(80).optional().or(z.literal("")), tags: z.array(z.string().trim().min(1)).default([]) });
 export const guideSchema = z.object({ ...base, tags: z.array(z.string().trim().min(1)).default([]) });
 export const faqSchema = z.object({ ...base, summary: optionalBoth });
 export const locationPageSchema = z.object({
@@ -73,6 +73,7 @@ export const servicePageSchema = z.object({
 
 export type ContentRecord = CatalogRecord<z.infer<typeof articleSchema>> & {
   authorName?: string;
+  sponsoredBy?: string;
   tags?: string[];
   locationName?: string;
   address?: string;
@@ -121,8 +122,9 @@ const bodyFields = (bodyLabel = "Body (Markdown)"): FieldDescriptor[] => [
 export const articleDefinition = make({
   key: "articles", collection: "contentArticles", label: "Article", labelPlural: "Articles", icon: "📰",
   publicPath: "/articles", auditPrefix: "ARTICLE", imageFolder: "articles", schema: articleSchema,
-  defaults: { authorName: "", tags: [] },
+  defaults: { authorName: "", sponsoredBy: "", tags: [] },
   fields: [
+    { type: "text", name: "sponsoredBy", label: "Sponsored by (leave blank unless paid)", hint: "Shows a \"Sponsored content\" disclosure on the article and marks its external links rel=sponsored." },
     { type: "localized", name: "title", label: "Title" }, slugField, topicField, ...bodyFields(),
     { type: "text", name: "authorName", label: "Author (optional)" },
     { type: "tags", name: "tags", label: "Tags" }, eventIdsField, imagesField, ...seoFields,

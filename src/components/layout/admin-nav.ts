@@ -84,7 +84,10 @@ export const ADMIN_NAV: AdminNavSection[] = [
     title: "Platform",
     items: [
       { label: "Users", href: "/admin/users", icon: "👤" },
-      { label: "Advertisements", href: "/admin/advertisements", icon: "📣" },
+      { label: "Advertisers", href: "/admin/advertisers", icon: "🏷️" },
+      { label: "Ad Campaigns", href: "/admin/ad-campaigns", icon: "📣" },
+      { label: "Ad Placements", href: "/admin/ad-placements", icon: "🧩" },
+      { label: "Analytics", href: "/admin/analytics", icon: "📊" },
       { label: "Reports", href: "/admin/reports", icon: "📈" },
       { label: "Audit Logs", href: "/admin/audit-logs", icon: "🧾" },
       { label: "Settings", href: "/admin/settings", icon: "⚙️" },

@@ -2,6 +2,9 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { parseMarkdown, type Block, type Inline } from "@/lib/content/markdown";
 
+/** Set only for the duration of one synchronous Markdown render (see Markdown below). */
+let sponsoredLinks = false;
+
 export function renderInline(nodes: Inline[]): ReactNode[] {
   return nodes.map((n, i) => {
     switch (n.t) {
@@ -15,7 +18,7 @@ export function renderInline(nodes: Inline[]): ReactNode[] {
         return <code key={i} className="rounded bg-river-mist px-1 py-0.5 text-[0.9em]">{n.v}</code>;
       case "link":
         return n.external ? (
-          <a key={i} href={n.href} className="text-river-deep underline" {...(n.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+          <a key={i} href={n.href} className="text-river-deep underline" {...(n.href.startsWith("http") ? { target: "_blank", rel: sponsoredLinks ? "sponsored noopener noreferrer" : "noopener noreferrer" } : {})}>
             {renderInline(n.c)}
           </a>
         ) : (
@@ -46,6 +49,12 @@ function renderBlock(b: Block, i: number): ReactNode {
 }
 
 /** Server component: Markdown source -> React elements. No raw HTML is ever emitted. */
-export function Markdown({ source }: { source: string }) {
-  return <div>{parseMarkdown(source).map(renderBlock)}</div>;
+/** `sponsored` marks external links rel="sponsored" (paid content). The flag is set and cleared around one synchronous render. */
+export function Markdown({ source, sponsored = false }: { source: string; sponsored?: boolean }) {
+  sponsoredLinks = sponsored;
+  try {
+    return <div>{parseMarkdown(source).map(renderBlock)}</div>;
+  } finally {
+    sponsoredLinks = false;
+  }
 }

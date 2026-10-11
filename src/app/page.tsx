@@ -4,6 +4,7 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { Hero } from "@/components/layout/Hero";
 import { ServiceCard, Badge } from "@/components/ui";
 import { ROUTES } from "@/config/app";
+import { AdSlot } from "@/components/ads/AdSlot";
 
 /**
  * Homepage shell — Sprint 1 (Design System & Application Shell).
@@ -30,6 +31,7 @@ export default async function Home() {
   return (
     <SiteShell>
       <Hero dict={dict} />
+      <AdSlot placement="home_hero" className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8" />
 
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="mb-6 flex items-center justify-between">
@@ -42,6 +44,8 @@ export default async function Home() {
           ))}
         </div>
       </section>
+
+      <AdSlot placement="home_featured" className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 lg:px-8" />
 
       <section className="border-t border-border bg-surface-raised">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-2 px-4 py-12 text-center sm:px-6 lg:px-8">
