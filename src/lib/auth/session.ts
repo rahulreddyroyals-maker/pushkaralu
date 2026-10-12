@@ -1,5 +1,5 @@
 import "server-only";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { getAdminAuth } from "@/lib/firebase/admin";
 import type { Role } from "@/types/roles";
 import { SESSION_COOKIE_NAME } from "./constants";
@@ -53,15 +53,35 @@ export async function clearSessionCookie(): Promise<void> {
 export async function getServerUser(): Promise<ServerUser | null> {
   const store = await cookies();
   const sessionCookie = store.get(SESSION_COOKIE_NAME)?.value;
-  if (!sessionCookie) return null;
+  if (sessionCookie) {
+    try {
+      const decoded = await getAdminAuth().verifySessionCookie(sessionCookie, true);
+      return toServerUser(decoded);
+    } catch {
+      // Invalid, expired, or revoked cookie — fall through to the bearer check, then "not logged in".
+    }
+  }
+  return getBearerUser();
+}
 
+function toServerUser(decoded: { uid: string; email?: string; role?: unknown }): ServerUser {
+  return { uid: decoded.uid, email: decoded.email ?? null, role: (decoded.role as Role | undefined) ?? null };
+}
+
+/**
+ * Native-app auth: the mobile app has no cookie jar, so it sends its Firebase
+ * ID token as `Authorization: Bearer <token>`. Verified with the Admin SDK
+ * (signature, expiry, revocation) exactly like the cookie path — never decoded
+ * by hand. Bearer tokens are not sent automatically by browsers, so this adds
+ * no CSRF exposure.
+ */
+async function getBearerUser(): Promise<ServerUser | null> {
   try {
-    const adminAuth = getAdminAuth();
-    const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
-    const role = (decoded.role as Role | undefined) ?? null;
-    return { uid: decoded.uid, email: decoded.email ?? null, role };
+    const header = (await headers()).get("authorization") ?? "";
+    const match = /^Bearer\s+(\S+)$/i.exec(header);
+    if (!match) return null;
+    return toServerUser(await getAdminAuth().verifyIdToken(match[1]!, true));
   } catch {
-    // Invalid, expired, or revoked cookie — treat identically to "not logged in".
     return null;
   }
 }
