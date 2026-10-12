@@ -35,6 +35,18 @@ export async function POST(req: NextRequest) {
   }
 
   const db = getAdminDb();
+
+  // The amount comes from the client, and a paid booking auto-confirms — so for listings with a published price
+  // the server enforces a floor (the hotel's lowest nightly price x quantity). Other listing types have no
+  // structured price; providers see the amount and can decline an unreasonable request.
+  if (parsed.data.providerType === "hotel") {
+    const hotel = await db.collection("hotels").doc(parsed.data.providerId).get();
+    const floor = Number(hotel.data()?.priceRangeMin ?? 0) * parsed.data.quantity;
+    if (floor > 0 && parsed.data.amount < floor) {
+      return NextResponse.json({ error: `The amount is below this hotel's minimum price (₹${floor}).` }, { status: 400 });
+    }
+  }
+
   const profile = await db.collection("users").doc(user.uid).get();
   const displayName = (profile.data()?.displayName as string | undefined) ?? "A pilgrim";
 
