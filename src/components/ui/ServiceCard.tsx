@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Card } from "./Card";
+import { Tr } from "@/components/i18n/Tr";
 
 interface ServiceCardProps {
   href: string;
@@ -22,8 +23,8 @@ export function ServiceCard({ href, icon, label, description }: ServiceCardProps
           {icon}
         </div>
         <div>
-          <p className="font-semibold text-ink">{label}</p>
-          {description && <p className="mt-0.5 text-sm text-ink-muted">{description}</p>}
+          <p className="font-semibold text-ink"><Tr>{label}</Tr></p>
+          {description && <p className="mt-0.5 text-sm text-ink-muted"><Tr>{description}</Tr></p>}
         </div>
       </Card>
     </Link>

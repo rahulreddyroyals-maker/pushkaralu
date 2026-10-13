@@ -12,8 +12,11 @@ import { RoleGate } from "@/components/auth/RoleGate";
 import { STAFF_ROLES } from "@/types/roles";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { signOutUser } from "@/features/auth/client";
+import { useTr } from "@/lib/i18n/LocaleProvider";
+import { LanguageToggle } from "@/components/i18n/LanguageToggle";
 
 function AuthControls({ onNavigate }: { onNavigate?: () => void }) {
+  const tr = useTr();
   const { user, loading } = useAuth();
   const router = useRouter();
 
@@ -55,7 +58,7 @@ function AuthControls({ onNavigate }: { onNavigate?: () => void }) {
       <NotificationBell onNavigate={onNavigate} />
       <Link href="/profile" onClick={onNavigate}>
         <Button variant="ghost" size="sm" fullWidth>
-          {user.displayName ?? "Profile"}
+          {user.displayName ?? tr("Profile")}
         </Button>
       </Link>
       <Button size="sm" fullWidth onClick={handleSignOut}>
@@ -66,6 +69,7 @@ function AuthControls({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 export function Header() {
+  const tr = useTr();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -73,7 +77,7 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href={ROUTES.home} className="flex items-center gap-2" aria-label="Pushkaralu home">
           <Image src="/logo.png" alt="" width={40} height={40} priority className="h-10 w-10 rounded-lg" />
-          <span className="text-lg font-bold tracking-tight text-river-deep">Pushkaralu</span>
+          <span className="text-lg font-bold tracking-tight text-river-deep">{tr("Pushkaralu")}</span>
         </Link>
 
         {/* Desktop navigation */}
@@ -84,12 +88,13 @@ export function Header() {
               href={link.href}
               className="rounded-md px-3 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-river-mist hover:text-river-deep"
             >
-              {link.label}
+              {tr(link.label)}
             </Link>
           ))}
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
+          <LanguageToggle />
           <AuthControls />
         </div>
 
@@ -121,12 +126,13 @@ export function Header() {
                   onClick={() => setMobileOpen(false)}
                   className="block rounded-md px-2 py-3 text-sm font-medium text-ink hover:bg-river-mist"
                 >
-                  {link.label}
+                  {tr(link.label)}
                 </Link>
               </li>
             ))}
           </ul>
           <div className="mt-3 flex flex-col gap-2 border-t border-border pt-3">
+            <LanguageToggle className="self-start" />
             <AuthControls onNavigate={() => setMobileOpen(false)} />
           </div>
         </nav>

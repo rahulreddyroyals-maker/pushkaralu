@@ -1,3 +1,4 @@
+import { Tr } from "@/components/i18n/Tr";
 import { SearchBar } from "@/components/ui";
 import type { Dictionary } from "@/lib/i18n/types";
 
@@ -29,12 +30,12 @@ export function Hero({ dict }: { dict: Dictionary }) {
 
       <div className="relative mx-auto flex max-w-4xl flex-col items-center gap-6 px-4 py-20 text-center sm:px-6 sm:py-28">
         <span className="font-data rounded-full bg-saffron-light px-3 py-1 text-xs font-medium uppercase tracking-wide text-[#8a5410]">
-          Godavari Pushkaralu 2027
+          <Tr>Godavari Pushkaralu 2027</Tr>
         </span>
         <h1 className="text-4xl font-bold tracking-tight text-ink sm:text-5xl">
-          {dict.home.heroTitle}
+          <Tr>{dict.home.heroTitle}</Tr>
         </h1>
-        <p className="max-w-xl text-lg text-ink-muted">{dict.home.heroSubtitle}</p>
+        <p className="max-w-xl text-lg text-ink-muted"><Tr>{dict.home.heroSubtitle}</Tr></p>
         <div className="w-full max-w-xl">
           <SearchBar />
         </div>

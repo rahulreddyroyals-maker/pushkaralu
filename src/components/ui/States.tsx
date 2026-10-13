@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils/cn";
 import type { ReactNode } from "react";
 import { Button } from "./Button";
+import { Tr } from "@/components/i18n/Tr";
 
 interface StateShellProps {
   icon?: ReactNode;
@@ -19,8 +20,8 @@ function StateShell({ icon, title, description, action, className }: StateShellP
       )}
     >
       {icon && <div className="text-3xl">{icon}</div>}
-      <h3 className="text-base font-semibold text-ink">{title}</h3>
-      {description && <p className="max-w-sm text-sm text-ink-muted">{description}</p>}
+      <h3 className="text-base font-semibold text-ink"><Tr>{title}</Tr></h3>
+      {description && <p className="max-w-sm text-sm text-ink-muted"><Tr>{description}</Tr></p>}
       {action && (
         <Button size="sm" variant="outline" onClick={action.onClick} className="mt-1">
           {action.label}

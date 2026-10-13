@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Tr } from "@/components/i18n/Tr";
 import { Button, Input, Tabs } from "@/components/ui";
 import { AuthCard, AuthErrorText, friendlyAuthError } from "@/features/auth/components/AuthCard";
 import { loginSchema, phoneLoginSchema, phoneOtpSchema } from "@/features/auth/schemas";
@@ -76,7 +77,7 @@ function EmailLoginForm({ onSuccess }: { onSuccess: () => void }) {
           autoComplete="current-password"
         />
         <Link href="/forgot-password" className="mt-1.5 inline-block text-xs text-river-current hover:underline">
-          Forgot password?
+          <Tr>Forgot password?</Tr>
         </Link>
       </div>
       <Button type="submit" fullWidth disabled={submitting}>
@@ -201,7 +202,7 @@ export default function LoginPage() {
         <span className="text-ink-muted">
           New here?{" "}
           <Link href="/register" className="font-medium text-river-deep hover:underline">
-            Create an account
+            <Tr>Create an account</Tr>
           </Link>
         </span>
       }
@@ -215,11 +216,11 @@ export default function LoginPage() {
       />
       <div className="my-4 flex items-center gap-3">
         <div className="h-px flex-1 bg-border" />
-        <span className="text-xs text-ink-muted">OR</span>
+        <span className="text-xs text-ink-muted"><Tr>OR</Tr></span>
         <div className="h-px flex-1 bg-border" />
       </div>
       <Button variant="outline" fullWidth onClick={handleGoogle}>
-        Continue with Google
+        <Tr>Continue with Google</Tr>
       </Button>
     </AuthCard>
   );

@@ -6,6 +6,7 @@ import { api } from "@/lib/clientApi";
 import { parseInline } from "@/lib/content/markdown";
 import { renderInline } from "@/components/content/Markdown";
 import { splitCitations, stripCitations } from "../citations";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 import type { AssistantReply, Lang, VerifiedItem } from "../types";
 
 type ChatResponse = AssistantReply & { remaining: number };
@@ -74,8 +75,9 @@ function VerifiedCards({ items, t }: { items: VerifiedItem[]; t: (typeof UI)[Lan
   );
 }
 
-export function AssistantChat({ initialLang = "en" }: { initialLang?: Lang }) {
-  const [lang, setLang] = useState<Lang>(initialLang);
+export function AssistantChat({ initialLang }: { initialLang?: Lang }) {
+  const site = useLocale().lang;
+  const [lang, setLang] = useState<Lang>(initialLang ?? site);
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);

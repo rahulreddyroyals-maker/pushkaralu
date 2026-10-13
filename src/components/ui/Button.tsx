@@ -1,4 +1,7 @@
+"use client";
+
 import { cn } from "@/lib/utils/cn";
+import { useTr } from "@/lib/i18n/LocaleProvider";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 type Variant = "primary" | "secondary" | "outline" | "ghost" | "danger";
@@ -36,6 +39,7 @@ export function Button({
   disabled,
   ...props
 }: ButtonProps) {
+  const tr = useTr();
   return (
     <button
       className={cn(
@@ -51,7 +55,7 @@ export function Button({
       {...props}
     >
       {icon}
-      {children}
+      {typeof children === "string" ? tr(children) : children}
     </button>
   );
 }

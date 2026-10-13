@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Tr } from "@/components/i18n/Tr";
 import { Button, Input } from "@/components/ui";
 import { AuthCard, AuthErrorText, friendlyAuthError } from "@/features/auth/components/AuthCard";
 import { registerSchema } from "@/features/auth/schemas";
@@ -80,7 +81,7 @@ export default function RegisterPage() {
         <span className="text-ink-muted">
           Already have an account?{" "}
           <Link href="/login" className="font-medium text-river-deep hover:underline">
-            Sign in
+            <Tr>Sign in</Tr>
           </Link>
         </span>
       }
@@ -120,18 +121,18 @@ export default function RegisterPage() {
           autoComplete="new-password"
         />
         <Button type="submit" fullWidth disabled={submitting}>
-          {submitting ? "Creating account..." : "Create account"}
+          <Tr>{submitting ? "Creating account..." : "Create account"}</Tr>
         </Button>
       </form>
 
       <div className="my-4 flex items-center gap-3">
         <div className="h-px flex-1 bg-border" />
-        <span className="text-xs text-ink-muted">OR</span>
+        <span className="text-xs text-ink-muted"><Tr>OR</Tr></span>
         <div className="h-px flex-1 bg-border" />
       </div>
 
       <Button variant="outline" fullWidth onClick={handleGoogle} disabled={submitting}>
-        Continue with Google
+        <Tr>Continue with Google</Tr>
       </Button>
     </AuthCard>
   );

@@ -1,3 +1,4 @@
+import { Tr } from "@/components/i18n/Tr";
 import { cn } from "@/lib/utils/cn";
 import type { HTMLAttributes } from "react";
 
@@ -38,7 +39,7 @@ export function Badge({ tone = "neutral", dot = false, className, children, ...p
       {...props}
     >
       {dot && <span className={cn("h-1.5 w-1.5 rounded-full", dotClasses[tone])} aria-hidden />}
-      {children}
+      {typeof children === "string" ? <Tr>{children}</Tr> : children}
     </span>
   );
 }

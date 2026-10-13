@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ROUTES } from "@/config/app";
+import { Tr } from "@/components/i18n/Tr";
 import { FOOTER_COLUMNS } from "./nav-links";
 
 export function Footer() {
@@ -32,13 +33,13 @@ export function Footer() {
           {FOOTER_COLUMNS.map((col) => (
             <div key={col.title}>
               <h3 className="text-sm font-semibold uppercase tracking-wide text-white/60">
-                {col.title}
+                <Tr>{col.title}</Tr>
               </h3>
               <ul className="mt-3 flex flex-col gap-2">
                 {col.links.map((link) => (
                   <li key={link.href}>
                     <Link href={link.href} className="text-sm text-white/85 hover:text-saffron">
-                      {link.label}
+                      <Tr>{link.label}</Tr>
                     </Link>
                   </li>
                 ))}
@@ -50,27 +51,27 @@ export function Footer() {
         <div className="mt-10 flex flex-col gap-4 border-t border-white/15 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
             <Image src="/logo.png" alt="" width={32} height={32} className="h-8 w-8 rounded-md" />
-            <p className="text-sm font-semibold">Pushkaralu</p>
+            <p className="text-sm font-semibold"><Tr>Pushkaralu</Tr></p>
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/70">
             <Link href={ROUTES.about} className="hover:text-white">
-              About
+              <Tr>About</Tr>
             </Link>
             <Link href={ROUTES.contact} className="hover:text-white">
-              Contact
+              <Tr>Contact</Tr>
             </Link>
             <Link href="/terms" className="hover:text-white">
-              Terms
+              <Tr>Terms</Tr>
             </Link>
             <Link href="/privacy" className="hover:text-white">
-              Privacy
+              <Tr>Privacy</Tr>
             </Link>
             <Link href="/refund-policy" className="hover:text-white">
-              Refund Policy
+              <Tr>Refund Policy</Tr>
             </Link>
           </div>
           <p className="text-xs text-white/50">
-            © {new Date().getFullYear()} Pushkaralu. All rights reserved.
+            © {new Date().getFullYear()} <Tr>Pushkaralu</Tr>. <Tr>All rights reserved.</Tr>
           </p>
         </div>
       </div>

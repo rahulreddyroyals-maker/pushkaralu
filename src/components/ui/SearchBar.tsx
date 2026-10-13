@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils/cn";
 import { useState, type FormEvent } from "react";
+import { useTr } from "@/lib/i18n/LocaleProvider";
 import { track } from "@/lib/analytics/client";
 
 interface SearchBarProps {
@@ -23,6 +24,7 @@ export function SearchBar({
   className,
   size = "lg",
 }: SearchBarProps) {
+  const tr = useTr();
   const [value, setValue] = useState(defaultValue);
 
   function handleSubmit(e: FormEvent) {
@@ -49,7 +51,7 @@ export function SearchBar({
         type="search"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder={placeholder}
+        placeholder={tr(placeholder)}
         className={cn(
           "flex-1 bg-transparent text-ink placeholder:text-ink-muted focus:outline-none",
           size === "lg" ? "text-base" : "text-sm"
@@ -59,7 +61,7 @@ export function SearchBar({
         type="submit"
         className="rounded-full bg-saffron px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#d6870f]"
       >
-        Search
+        {tr("Search")}
       </button>
     </form>
   );

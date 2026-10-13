@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Card } from "@/components/ui";
+import { Tr } from "@/components/i18n/Tr";
 
 interface AuthCardProps {
   title: string;
@@ -11,8 +12,8 @@ interface AuthCardProps {
 export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
   return (
     <Card padding="lg">
-      <h1 className="text-xl font-semibold text-ink">{title}</h1>
-      {subtitle && <p className="mt-1 text-sm text-ink-muted">{subtitle}</p>}
+      <h1 className="text-xl font-semibold text-ink"><Tr>{title}</Tr></h1>
+      {subtitle && <p className="mt-1 text-sm text-ink-muted"><Tr>{subtitle}</Tr></p>}
       <div className="mt-6">{children}</div>
       {footer && <div className="mt-6 border-t border-border pt-4 text-center text-sm">{footer}</div>}
     </Card>
@@ -23,7 +24,7 @@ export function AuthErrorText({ message }: { message: string | null }) {
   if (!message) return null;
   return (
     <p className="rounded-md bg-[rgba(201,59,59,0.08)] px-3 py-2 text-sm text-status-critical" role="alert">
-      {message}
+      <Tr>{message}</Tr>
     </p>
   );
 }

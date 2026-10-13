@@ -1,4 +1,7 @@
+"use client";
+
 import { cn } from "@/lib/utils/cn";
+import { useTr } from "@/lib/i18n/LocaleProvider";
 import { useId, type InputHTMLAttributes } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -8,13 +11,14 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export function Input({ label, error, hint, id, className, ...props }: InputProps) {
+  const tr = useTr();
   const generatedId = useId();
   const inputId = id ?? generatedId;
   return (
     <div className="flex flex-col gap-1.5">
       {label && (
         <label htmlFor={inputId} className="text-sm font-medium text-ink">
-          {label}
+          {tr(label)}
         </label>
       )}
       <input
@@ -28,15 +32,16 @@ export function Input({ label, error, hint, id, className, ...props }: InputProp
         aria-invalid={!!error}
         aria-describedby={error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined}
         {...props}
+        placeholder={props.placeholder ? tr(props.placeholder) : undefined}
       />
       {error && (
         <p id={`${inputId}-error`} className="text-xs text-status-critical">
-          {error}
+          {tr(error)}
         </p>
       )}
       {!error && hint && (
         <p id={`${inputId}-hint`} className="text-xs text-ink-muted">
-          {hint}
+          {tr(hint)}
         </p>
       )}
     </div>

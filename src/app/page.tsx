@@ -2,7 +2,8 @@ import { getDictionary } from "@/lib/i18n";
 import { DEFAULT_LOCALE } from "@/lib/i18n/types";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { Hero } from "@/components/layout/Hero";
-import { ServiceCard, Badge } from "@/components/ui";
+import { ServiceCard } from "@/components/ui";
+import { Tr } from "@/components/i18n/Tr";
 import { ROUTES } from "@/config/app";
 import { AdSlot } from "@/components/ads/AdSlot";
 
@@ -35,8 +36,7 @@ export default async function Home() {
 
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-ink">Everything for your visit</h2>
-          <Badge tone="info">Sprint 1 — shell only</Badge>
+          <h2 className="text-xl font-semibold text-ink"><Tr>Everything for your visit</Tr></h2>
         </div>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {services.map((s) => (
