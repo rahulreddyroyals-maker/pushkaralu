@@ -1,6 +1,7 @@
 import type { ChatMessage, GenerateRequest, GenerateResult, LlmProvider, ToolCall } from "../types";
 import type { AiConfig } from "../config";
 import { postJson } from "./http";
+import { AiProviderError } from "../types";
 
 /** Neutral messages -> OpenAI-compatible chat.completions shape. */
 export function toOpenAiMessages(system: string, messages: ChatMessage[]): unknown[] {
@@ -44,21 +45,45 @@ export function fromOpenAiResponse(res: OpenAiResponse): GenerateResult {
   };
 }
 
+/** Groq retires models from time to time; this still-supported small model keeps the assistant answering if AI_MODEL goes stale. */
+export const GROQ_FALLBACK_MODEL = "llama-3.1-8b-instant";
+
 export function createOpenAiProvider(config: AiConfig): LlmProvider {
   const base = (config.baseUrl ?? "https://api.openai.com/v1").replace(/\/+$/, "");
+
+  async function call(req: GenerateRequest, model: string, withTools: boolean): Promise<GenerateResult> {
+    const body = {
+      model,
+      max_tokens: req.maxTokens ?? 1200,
+      temperature: req.temperature ?? 0.3,
+      messages: toOpenAiMessages(req.system, req.messages),
+      ...(withTools && req.tools?.length ? { tools: req.tools.map((t) => ({ type: "function", function: { name: t.name, description: t.description, parameters: t.parameters } })), tool_choice: "auto" } : {}),
+    };
+    const res = await postJson(`${base}/chat/completions`, { authorization: `Bearer ${config.apiKey}` }, body, config.timeoutMs, req.signal);
+    return fromOpenAiResponse(res as OpenAiResponse);
+  }
+
   return {
     name: config.provider,
     model: config.model,
     async generate(req: GenerateRequest) {
-      const body = {
-        model: config.model,
-        max_tokens: req.maxTokens ?? 1200,
-        temperature: req.temperature ?? 0.3,
-        messages: toOpenAiMessages(req.system, req.messages),
-        ...(req.tools?.length ? { tools: req.tools.map((t) => ({ type: "function", function: { name: t.name, description: t.description, parameters: t.parameters } })) } : {}),
-      };
-      const res = await postJson(`${base}/chat/completions`, { authorization: `Bearer ${config.apiKey}` }, body, config.timeoutMs, req.signal);
-      return fromOpenAiResponse(res as OpenAiResponse);
+      const hasTools = Boolean(req.tools?.length);
+      try {
+        return await call(req, config.model, true);
+      } catch (error) {
+        if (!(error instanceof AiProviderError)) throw error;
+        // Small open models occasionally emit a malformed tool call (HTTP 400 tool_use_failed): retry the turn once without tools.
+        if (error.status === 400 && hasTools && /tool/i.test(error.detail ?? "")) {
+          console.warn("[assistant] tool call rejected by provider, retrying without tools:", error.detail);
+          return await call(req, config.model, false);
+        }
+        // Retired / unknown model on Groq: fall back once instead of taking the assistant down.
+        if (config.provider === "groq" && config.model !== GROQ_FALLBACK_MODEL && (error.status === 404 || (error.status === 400 && /model/i.test(error.detail ?? "")))) {
+          console.warn(`[assistant] model "${config.model}" unavailable (${error.detail ?? error.status}); falling back to ${GROQ_FALLBACK_MODEL}`);
+          return await call(req, GROQ_FALLBACK_MODEL, hasTools);
+        }
+        throw error;
+      }
     },
   };
 }

@@ -32,7 +32,6 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { label: "Ghats", href: "/admin/ghats", icon: "🌊" },
       { label: "Temples", href: "/admin/temples", icon: "🛕" },
       { label: "Rituals", href: "/admin/rituals", icon: "🪔" },
-      { label: "News", href: "/admin/news", icon: "📰" },
     ],
   },
   {
@@ -53,7 +52,6 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { label: "Businesses", href: "/admin/businesses", icon: "🏬" },
       { label: "Bookings", href: "/admin/bookings", icon: "📖" },
       { label: "Revenue", href: "/admin/revenue", icon: "💳" },
-      { label: "Reviews", href: "/admin/reviews", icon: "⭐" },
     ],
   },
   {
@@ -88,8 +86,6 @@ export const ADMIN_NAV: AdminNavSection[] = [
       { label: "Ad Campaigns", href: "/admin/ad-campaigns", icon: "📣" },
       { label: "Ad Placements", href: "/admin/ad-placements", icon: "🧩" },
       { label: "Analytics", href: "/admin/analytics", icon: "📊" },
-      { label: "Reports", href: "/admin/reports", icon: "📈" },
-      { label: "Audit Logs", href: "/admin/audit-logs", icon: "🧾" },
       { label: "Settings", href: "/admin/settings", icon: "⚙️" },
     ],
   },

@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:rules": "vitest run --config vitest.rules.config.mts",
-    "seed": "tsx scripts/seed-demo-data.ts"
+    "seed": "tsx scripts/seed-demo-data.ts",
+    "make-super-admin": "tsx scripts/make-super-admin.ts"
   },
   "dependencies": {
     "firebase": "^12.18.0",

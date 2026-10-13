@@ -52,7 +52,8 @@ export class AiConfigError extends Error {
 }
 
 export class AiProviderError extends Error {
-  constructor(message: string, readonly status?: number) {
+  /** `detail` is the provider's short error code/message (server logs and admin probe only, never sent to visitors). */
+  constructor(message: string, readonly status?: number, readonly detail?: string) {
     super(message);
     this.name = "AiProviderError";
   }

@@ -49,3 +49,53 @@ describe("readAiConfig", () => {
     expect(() => readAiConfig({ AI_PROVIDER: "nope", AI_API_KEY: "k", AI_MODEL: "m" })).toThrow();
   });
 });
+
+describe("openai/groq provider resilience", () => {
+  const cfg = { enabled: true, provider: "groq" as const, model: "old-model", apiKey: "k", baseUrl: "https://x.test/v1", timeoutMs: 5000 };
+  const okBody = { choices: [{ finish_reason: "stop", message: { content: "hi" } }] };
+  const req = { system: "s", messages: [{ role: "user" as const, content: "q" }], tools: [{ name: "t", description: "d", parameters: { type: "object" } }] };
+  const mkFetch = (responses: Array<{ status: number; body: unknown }>) => {
+    const bodies: Record<string, unknown>[] = [];
+    const fn = async (_u: unknown, init: { body: string }) => {
+      bodies.push(JSON.parse(init.body));
+      const r = responses.shift()!;
+      return new Response(JSON.stringify(r.body), { status: r.status });
+    };
+    return { fn, bodies };
+  };
+
+  it("retries without tools on a tool_use_failed 400", async () => {
+    const { createOpenAiProvider } = await import("./providers/openai");
+    const { fn, bodies } = mkFetch([{ status: 400, body: { error: { code: "tool_use_failed", message: "bad tool call" } } }, { status: 200, body: okBody }]);
+    const orig = globalThis.fetch;
+    globalThis.fetch = fn as unknown as typeof fetch;
+    try {
+      const out = await createOpenAiProvider(cfg).generate(req);
+      expect(out.text).toBe("hi");
+      expect(bodies[0].tools).toBeDefined();
+      expect(bodies[1].tools).toBeUndefined();
+    } finally { globalThis.fetch = orig; }
+  });
+
+  it("falls back to a supported Groq model when the configured one is gone", async () => {
+    const { createOpenAiProvider, GROQ_FALLBACK_MODEL } = await import("./providers/openai");
+    const { fn, bodies } = mkFetch([{ status: 404, body: { error: { code: "model_not_found", message: "no such model" } } }, { status: 200, body: okBody }]);
+    const orig = globalThis.fetch;
+    globalThis.fetch = fn as unknown as typeof fetch;
+    try {
+      const out = await createOpenAiProvider(cfg).generate(req);
+      expect(out.text).toBe("hi");
+      expect(bodies[1].model).toBe(GROQ_FALLBACK_MODEL);
+    } finally { globalThis.fetch = orig; }
+  });
+
+  it("surfaces 401 as a provider error with detail (no retry)", async () => {
+    const { createOpenAiProvider } = await import("./providers/openai");
+    const { fn } = mkFetch([{ status: 401, body: { error: { code: "invalid_api_key", message: "Invalid API Key" } } }]);
+    const orig = globalThis.fetch;
+    globalThis.fetch = fn as unknown as typeof fetch;
+    try {
+      await expect(createOpenAiProvider(cfg).generate(req)).rejects.toMatchObject({ status: 401, detail: expect.stringContaining("invalid_api_key") });
+    } finally { globalThis.fetch = orig; }
+  });
+});
