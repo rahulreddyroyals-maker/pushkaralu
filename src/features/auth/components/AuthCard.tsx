@@ -31,7 +31,23 @@ export function AuthErrorText({ message }: { message: string | null }) {
 /** Maps common Firebase Auth error codes to messages that don't leak internals (spec §39). */
 export function friendlyAuthError(error: unknown): string {
   const code = (error as { code?: string })?.code ?? "";
+  if (code && typeof console !== "undefined") console.error("[auth] Firebase error:", code, (error as { message?: string })?.message);
   switch (code) {
+    case "auth/operation-not-allowed":
+    case "auth/configuration-not-found":
+      return "Sign-up is not enabled yet. The site administrator must enable Email/Password sign-in in Firebase Authentication.";
+    case "auth/invalid-api-key":
+    case "auth/api-key-not-valid.-please-pass-a-valid-api-key.":
+    case "auth/app-not-authorized":
+      return "The site's Firebase configuration is invalid. Please contact the administrator.";
+    case "auth/unauthorized-domain":
+      return "This website's domain is not authorized in Firebase. The administrator must add it under Authentication > Settings > Authorized domains.";
+    case "auth/network-request-failed":
+      return "Network problem. Check your connection and try again.";
+    case "auth/invalid-email":
+      return "Enter a valid email address.";
+    case "auth/password-does-not-meet-requirements":
+      return "Password does not meet the requirements. Use at least 8 characters with a letter and a number.";
     case "auth/email-already-in-use":
       return "An account already exists with this email.";
     case "auth/invalid-credential":

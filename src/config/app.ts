@@ -17,7 +17,7 @@ export const APP_NAME = "Pushkaralu";
 
 export const DEFAULT_SEO = {
   titleSuffix: " | Pushkaralu",
-  defaultOgImage: "/og-default.jpg",
+  defaultOgImage: "/og-logo.png",
 };
 
 /** Route segments used across the app — keep in sync with docs/ROUTE_MAP.md */

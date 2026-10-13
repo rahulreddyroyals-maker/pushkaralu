@@ -53,9 +53,10 @@ export async function chat(deps: AssistantDeps, actor: ChatActor | null, visitor
     delete reply.meta; // internal diagnostics are logged above, never returned to the client
     return ok({ ...reply, remaining: decision.remaining });
   } catch (error) {
-    if (error instanceof AiConfigError) console.error("[assistant] misconfigured:", error.message);
-    else if (error instanceof AiProviderError) console.error("[assistant] provider error:", error.message, error.status ?? "");
+    let reason = "unexpected";
+    if (error instanceof AiConfigError) { reason = "not_configured"; console.error("[assistant] misconfigured:", error.message); }
+    else if (error instanceof AiProviderError) { reason = `provider_${error.status ?? "unreachable"}`; console.error("[assistant] provider error:", error.message, error.status ?? ""); }
     else console.error("[assistant] unexpected error", error);
-    return fail(503, UNAVAILABLE);
+    return fail(503, UNAVAILABLE, { reason }); // reason code only: no keys, prompts or provider bodies
   }
 }

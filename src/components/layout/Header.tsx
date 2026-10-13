@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui";
@@ -70,29 +71,9 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-surface-raised/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href={ROUTES.home} className="flex flex-col justify-center">
+        <Link href={ROUTES.home} className="flex items-center gap-2" aria-label="Pushkaralu home">
+          <Image src="/logo.png" alt="" width={40} height={40} priority className="h-10 w-10 rounded-lg" />
           <span className="text-lg font-bold tracking-tight text-river-deep">Pushkaralu</span>
-          {/* Signature river-line — thin flowing accent under the wordmark */}
-          <svg
-            aria-hidden
-            viewBox="0 0 120 6"
-            className="h-1.5 w-[100px]"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M0 3 Q 15 0, 30 3 T 60 3 T 90 3 T 120 3"
-              stroke="url(#header-river-gradient)"
-              strokeWidth="2"
-              fill="none"
-              strokeLinecap="round"
-            />
-            <defs>
-              <linearGradient id="header-river-gradient" x1="0" y1="0" x2="120" y2="0">
-                <stop offset="0%" stopColor="var(--color-river-current)" />
-                <stop offset="100%" stopColor="var(--color-saffron)" />
-              </linearGradient>
-            </defs>
-          </svg>
         </Link>
 
         {/* Desktop navigation */}

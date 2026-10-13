@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ROUTES } from "@/config/app";
 import { FOOTER_COLUMNS } from "./nav-links";
 
@@ -47,7 +48,10 @@ export function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col gap-4 border-t border-white/15 pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm font-semibold">Pushkaralu</p>
+          <div className="flex items-center gap-2">
+            <Image src="/logo.png" alt="" width={32} height={32} className="h-8 w-8 rounded-md" />
+            <p className="text-sm font-semibold">Pushkaralu</p>
+          </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/70">
             <Link href={ROUTES.about} className="hover:text-white">
               About
