@@ -57,7 +57,7 @@ function AuthControls({ onNavigate }: { onNavigate?: () => void }) {
       </RoleGate>
       <NotificationBell onNavigate={onNavigate} />
       <Link href="/profile" onClick={onNavigate}>
-        <Button variant="ghost" size="sm" fullWidth>
+        <Button variant="ghost" size="sm" fullWidth className="max-w-[8rem] truncate">
           {user.displayName ?? tr("Profile")}
         </Button>
       </Link>
@@ -81,19 +81,19 @@ export function Header() {
         </Link>
 
         {/* Desktop navigation */}
-        <nav aria-label="Primary" className="hidden lg:flex lg:items-center lg:gap-1">
+        <nav aria-label="Primary" className="hidden xl:flex xl:items-center xl:gap-1">
           {PRIMARY_NAV.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="rounded-md px-3 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-river-mist hover:text-river-deep"
+              className="whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-river-mist hover:text-river-deep"
             >
               {tr(link.label)}
             </Link>
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden shrink-0 items-center gap-2 xl:flex">
           <LanguageToggle />
           <AuthControls />
         </div>
@@ -105,7 +105,7 @@ export function Header() {
           aria-expanded={mobileOpen}
           aria-controls="mobile-nav-panel"
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          className="flex h-10 w-10 items-center justify-center rounded-md text-ink lg:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-md text-ink xl:hidden"
         >
           <span className="text-xl">{mobileOpen ? "✕" : "☰"}</span>
         </button>
@@ -116,7 +116,7 @@ export function Header() {
         <nav
           id="mobile-nav-panel"
           aria-label="Mobile primary"
-          className="border-t border-border bg-surface-raised px-4 py-3 lg:hidden"
+          className="border-t border-border bg-surface-raised px-4 py-3 xl:hidden"
         >
           <ul className="flex flex-col">
             {PRIMARY_NAV.map((link) => (
