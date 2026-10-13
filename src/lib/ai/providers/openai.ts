@@ -1,5 +1,5 @@
 import type { ChatMessage, GenerateRequest, GenerateResult, LlmProvider, ToolCall } from "../types";
-import type { AiConfig } from "../config";
+import { DEFAULT_GROQ_MODEL, type AiConfig } from "../config";
 import { postJson } from "./http";
 import { AiProviderError } from "../types";
 
@@ -46,7 +46,7 @@ export function fromOpenAiResponse(res: OpenAiResponse): GenerateResult {
 }
 
 /** Groq retires models from time to time; this still-supported small model keeps the assistant answering if AI_MODEL goes stale. */
-export const GROQ_FALLBACK_MODEL = "llama-3.1-8b-instant";
+export const GROQ_FALLBACK_MODEL = "openai/gpt-oss-20b";
 
 export function createOpenAiProvider(config: AiConfig): LlmProvider {
   const base = (config.baseUrl ?? "https://api.openai.com/v1").replace(/\/+$/, "");
@@ -54,7 +54,8 @@ export function createOpenAiProvider(config: AiConfig): LlmProvider {
   async function call(req: GenerateRequest, model: string, withTools: boolean): Promise<GenerateResult> {
     const body = {
       model,
-      max_tokens: req.maxTokens ?? 1200,
+      max_tokens: Math.max(req.maxTokens ?? 1200, model.startsWith("openai/gpt-oss") ? 2000 : 0),
+      ...(model.startsWith("openai/gpt-oss") ? { reasoning_effort: "low" } : {}), // reasoning tokens count against max_tokens; keep them small
       temperature: req.temperature ?? 0.3,
       messages: toOpenAiMessages(req.system, req.messages),
       ...(withTools && req.tools?.length ? { tools: req.tools.map((t) => ({ type: "function", function: { name: t.name, description: t.description, parameters: t.parameters } })), tool_choice: "auto" } : {}),
@@ -80,7 +81,14 @@ export function createOpenAiProvider(config: AiConfig): LlmProvider {
         // Retired / unknown model on Groq: fall back once instead of taking the assistant down.
         if (config.provider === "groq" && config.model !== GROQ_FALLBACK_MODEL && (error.status === 404 || (error.status === 400 && /model/i.test(error.detail ?? "")))) {
           console.warn(`[assistant] model "${config.model}" unavailable (${error.detail ?? error.status}); falling back to ${GROQ_FALLBACK_MODEL}`);
-          return await call(req, GROQ_FALLBACK_MODEL, hasTools);
+          // A stale AI_MODEL in the host env must not break the assistant: try the current default, then the small fallback.
+          for (const m of [DEFAULT_GROQ_MODEL, GROQ_FALLBACK_MODEL].filter((x) => x !== config.model)) {
+            try {
+              return await call(req, m, hasTools);
+            } catch (e2) {
+              if (!(e2 instanceof AiProviderError) || (e2.status !== 404 && e2.status !== 400)) throw e2;
+            }
+          }
         }
         throw error;
       }

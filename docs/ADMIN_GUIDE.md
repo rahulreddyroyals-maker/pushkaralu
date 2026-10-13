@@ -11,7 +11,14 @@
 | SUPER_ADMIN | Everything + grants Admin roles + fee/settings | yes |
 Only a SUPER_ADMIN can grant ADMIN or SUPER_ADMIN. ADMIN can grant the other roles.
 
-## Step 1: create the FIRST Super Admin (once)
+## Step 1 (easiest): create the FIRST Super Admin from Vercel
+1. Vercel -> Settings -> Environment Variables -> add `SUPER_ADMIN_EMAILS` = your email (comma-separated for several).
+2. Redeploy.
+3. On the website choose "Continue with Google" with that same email (the email must be verified by the provider; unverified email/password accounts are ignored on purpose).
+4. Open `/admin`. Sign out and in once more so Firestore rules also see the new role.
+5. Promote your team from `/admin/users`; then you may remove the variable.
+
+## Step 1 (alternative): script on your computer
 Nobody can grant the first one from the website, so do it from your computer:
 1. Register normally at `/register` with your email.
 2. In `pushkaralu/.env.local` set `FIREBASE_ADMIN_PROJECT_ID`, `FIREBASE_ADMIN_CLIENT_EMAIL`, `FIREBASE_ADMIN_PRIVATE_KEY` (a NEW service-account key from Firebase console > Project settings > Service accounts; never commit it, delete the key afterwards).

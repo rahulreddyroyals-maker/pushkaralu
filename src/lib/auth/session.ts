@@ -1,6 +1,7 @@
 import "server-only";
 import { cookies, headers } from "next/headers";
-import { getAdminAuth } from "@/lib/firebase/admin";
+import { FieldValue } from "firebase-admin/firestore";
+import { getAdminAuth, getAdminDb } from "@/lib/firebase/admin";
 import type { Role } from "@/types/roles";
 import { SESSION_COOKIE_NAME } from "./constants";
 
@@ -56,7 +57,7 @@ export async function getServerUser(): Promise<ServerUser | null> {
   if (sessionCookie) {
     try {
       const decoded = await getAdminAuth().verifySessionCookie(sessionCookie, true);
-      return toServerUser(decoded);
+      return await toServerUserWithBootstrap(decoded);
     } catch {
       // Invalid, expired, or revoked cookie — fall through to the bearer check, then "not logged in".
     }
@@ -66,6 +67,35 @@ export async function getServerUser(): Promise<ServerUser | null> {
 
 function toServerUser(decoded: { uid: string; email?: string; role?: unknown }): ServerUser {
   return { uid: decoded.uid, email: decoded.email ?? null, role: (decoded.role as Role | undefined) ?? null };
+}
+
+const bootstrapped = new Set<string>();
+
+/**
+ * First-Super-Admin bootstrap with no scripts: emails listed in the server-only env var
+ * SUPER_ADMIN_EMAILS (comma separated) become SUPER_ADMIN when they sign in with a
+ * VERIFIED email (e.g. Google sign-in, so nobody can claim the address by registering it first).
+ * The custom claim + users doc are written once; the role applies immediately for server checks and
+ * everywhere (Firestore rules, new tokens) after the next sign-in. Remove the variable once you have
+ * promoted your team from /admin/users if you want the bootstrap closed.
+ */
+async function toServerUserWithBootstrap(decoded: { uid: string; email?: string; email_verified?: boolean; role?: unknown }): Promise<ServerUser> {
+  const base = toServerUser(decoded);
+  const allowed = (process.env.SUPER_ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+  const email = decoded.email?.toLowerCase();
+  if (!email || !decoded.email_verified || !allowed.includes(email)) return base;
+  if (base.role !== "SUPER_ADMIN" && !bootstrapped.has(decoded.uid)) {
+    try {
+      await getAdminAuth().setCustomUserClaims(decoded.uid, { role: "SUPER_ADMIN" });
+      const db = getAdminDb();
+      await db.collection("users").doc(decoded.uid).set({ uid: decoded.uid, email, role: "SUPER_ADMIN", updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+      await db.collection("auditLogs").add({ actorUid: "bootstrap-env", action: "ROLE_ASSIGNED", targetType: "user", targetId: decoded.uid, metadata: { newRole: "SUPER_ADMIN", reason: "SUPER_ADMIN_EMAILS bootstrap" }, createdAt: FieldValue.serverTimestamp() });
+      bootstrapped.add(decoded.uid);
+    } catch (e) {
+      console.error("[auth] super-admin bootstrap failed", e);
+    }
+  }
+  return { ...base, role: "SUPER_ADMIN" };
 }
 
 /**
@@ -80,7 +110,7 @@ async function getBearerUser(): Promise<ServerUser | null> {
     const header = (await headers()).get("authorization") ?? "";
     const match = /^Bearer\s+(\S+)$/i.exec(header);
     if (!match) return null;
-    return toServerUser(await getAdminAuth().verifyIdToken(match[1]!, true));
+    return await toServerUserWithBootstrap(await getAdminAuth().verifyIdToken(match[1]!, true));
   } catch {
     return null;
   }

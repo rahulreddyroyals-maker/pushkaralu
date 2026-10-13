@@ -1,7 +1,7 @@
 import { AiConfigError } from "./types";
 
-/** Groq-hosted model with tool calling. Override with AI_MODEL if Groq retires it. */
-export const DEFAULT_GROQ_MODEL = "llama-3.3-70b-versatile";
+/** Groq-hosted model with tool calling (Llama 3.x was retired by Groq on 2026-08-16). Override with AI_MODEL if Groq retires it. */
+export const DEFAULT_GROQ_MODEL = "openai/gpt-oss-120b";
 export const GROQ_BASE_URL = "https://api.groq.com/openai/v1";
 
 export interface AiConfig {

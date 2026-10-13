@@ -40,7 +40,7 @@ describe("readAiConfig", () => {
     expect(() => readAiConfig({})).toThrow();
     expect(() => readAiConfig({ AI_PROVIDER: "openai", AI_API_KEY: "k" })).toThrow(); // model has no default outside groq
     expect(readAiConfig({ AI_API_KEY: "k", AI_MODEL: "m" })).toMatchObject({ provider: "groq", model: "m", enabled: true });
-    expect(readAiConfig({ GROQ_API_KEY: "g" })).toMatchObject({ provider: "groq", model: "llama-3.3-70b-versatile", baseUrl: "https://api.groq.com/openai/v1" });
+    expect(readAiConfig({ GROQ_API_KEY: "g" })).toMatchObject({ provider: "groq", model: "openai/gpt-oss-120b", baseUrl: "https://api.groq.com/openai/v1" });
     expect(readAiConfig({ AI_PROVIDER: "anthropic", ANTHROPIC_API_KEY: "a", AI_MODEL: "m" }).provider).toBe("anthropic");
   });
   it("can be switched off and swapped by env alone", () => {
@@ -78,14 +78,15 @@ describe("openai/groq provider resilience", () => {
   });
 
   it("falls back to a supported Groq model when the configured one is gone", async () => {
-    const { createOpenAiProvider, GROQ_FALLBACK_MODEL } = await import("./providers/openai");
+    const { createOpenAiProvider } = await import("./providers/openai");
+    const { DEFAULT_GROQ_MODEL } = await import("./config");
     const { fn, bodies } = mkFetch([{ status: 404, body: { error: { code: "model_not_found", message: "no such model" } } }, { status: 200, body: okBody }]);
     const orig = globalThis.fetch;
     globalThis.fetch = fn as unknown as typeof fetch;
     try {
       const out = await createOpenAiProvider(cfg).generate(req);
       expect(out.text).toBe("hi");
-      expect(bodies[1].model).toBe(GROQ_FALLBACK_MODEL);
+      expect(bodies[1].model).toBe(DEFAULT_GROQ_MODEL);
     } finally { globalThis.fetch = orig; }
   });
 
