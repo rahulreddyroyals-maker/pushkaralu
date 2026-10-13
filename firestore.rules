@@ -53,6 +53,13 @@ function roleFieldUnchanged() {
     request.resource.data.role == resource.data.role;
 }
 
+// Owner-editable provider listings: owners may edit content but never the
+// fields that grant trust or ownership (approval state, owner id, flags).
+function ownerTouchesProtected() {
+  return request.resource.data.diff(resource.data).affectedKeys()
+    .hasAny(['approvalStatus', 'ownerId', 'userId', 'featured', 'verified', 'rejectionReason', 'commissionRate']);
+}
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -142,23 +149,26 @@ service cloud.firestore {
     match /hotels/{id} {
       allow read: if resource.data.approvalStatus == 'VERIFIED' || isAdmin() ||
         (isSignedIn() && isOwner(resource.data.ownerId));
-      allow create: if isSignedIn();
-      allow update, delete: if isAdmin() ||
-        (isOwner(resource.data.ownerId) && isProviderRole());
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid && request.resource.data.approvalStatus == 'PENDING';
+      allow update: if isAdmin() ||
+        (isOwner(resource.data.ownerId) && isProviderRole() && !ownerTouchesProtected());
+      allow delete: if isAdmin();
     }
     match /purohits/{id} {
       allow read: if resource.data.approvalStatus == 'VERIFIED' || isAdmin() ||
         (isSignedIn() && isOwner(resource.data.userId));
-      allow create: if isSignedIn();
-      allow update, delete: if isAdmin() ||
-        (isOwner(resource.data.userId) && isProviderRole());
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid && request.resource.data.approvalStatus == 'PENDING';
+      allow update: if isAdmin() ||
+        (isOwner(resource.data.userId) && isProviderRole() && !ownerTouchesProtected());
+      allow delete: if isAdmin();
     }
     match /boatOperators/{id} {
       allow read: if resource.data.approvalStatus == 'VERIFIED' || isAdmin() ||
         (isSignedIn() && isOwner(resource.data.ownerId));
-      allow create: if isSignedIn();
-      allow update, delete: if isAdmin() ||
-        (isOwner(resource.data.ownerId) && isProviderRole());
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid && request.resource.data.approvalStatus == 'PENDING';
+      allow update: if isAdmin() ||
+        (isOwner(resource.data.ownerId) && isProviderRole() && !ownerTouchesProtected());
+      allow delete: if isAdmin();
     }
     match /boats/{id} {
       allow read: if true;
@@ -179,9 +189,10 @@ service cloud.firestore {
     match /businesses/{id} {
       allow read: if resource.data.approvalStatus == 'VERIFIED' || isAdmin() ||
         (isSignedIn() && isOwner(resource.data.ownerId));
-      allow create: if isSignedIn(); // registration flow — Module 20
-      allow update, delete: if isAdmin() ||
-        (isOwner(resource.data.ownerId) && isProviderRole());
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid && request.resource.data.approvalStatus == 'PENDING';
+      allow update: if isAdmin() ||
+        (isOwner(resource.data.ownerId) && isProviderRole() && !ownerTouchesProtected());
+      allow delete: if isAdmin();
     }
     match /packages/{id} {
       allow read: if true;
@@ -222,9 +233,9 @@ service cloud.firestore {
     // -------------------------------------------------------------------
     match /reviews/{id} {
       allow read: if true;
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update: if isModerator() ||
-        (isOwner(resource.data.userId));
+      // Created/edited through /api/reviews (verifies a completed booking and moderation state).
+      allow create: if false;
+      allow update: if isModerator();
       allow delete: if isModerator();
     }
 
@@ -244,7 +255,7 @@ service cloud.firestore {
     // -------------------------------------------------------------------
     match /lostFoundReports/{id} {
       allow read: if isModerator() || (isSignedIn() && resource.data.reporterUid == request.auth.uid);
-      allow create: if isSignedIn();
+      allow create: if false; // created via /api/lost-found so PII is validated and moderated server-side
       allow update, delete: if isModerator();
     }
 
@@ -252,13 +263,15 @@ service cloud.firestore {
     // Family safety
     // -------------------------------------------------------------------
     match /familyGroups/{groupId} {
-      allow read, write: if isSignedIn() && request.auth.uid in resource.data.memberUids;
-      allow create: if isSignedIn();
+      // Members can read their group. ALL writes go through /api/family (Admin SDK) so membership,
+      // roles and invite codes cannot be forged from a client.
+      allow read: if isSignedIn() && request.auth.uid in resource.data.memberUids;
+      allow write: if false;
 
       match /locations/{uid} {
-        allow read: if isSignedIn() && request.auth.uid == uid ||
-          get(/databases/$(database)/documents/familyGroups/$(groupId)).data.memberUids.hasAny([request.auth.uid]);
-        allow write: if isOwner(uid);
+        allow read: if isSignedIn() && (request.auth.uid == uid ||
+          get(/databases/$(database)/documents/familyGroups/$(groupId)).data.memberUids.hasAny([request.auth.uid]));
+        allow write: if false; // location sharing is written by the server so expiry/consent are enforced
       }
     }
 
@@ -276,7 +289,7 @@ service cloud.firestore {
     }
     match /leads/{id} {
       allow read: if isAdmin() || (isProviderRole() && isSignedIn() && resource.data.providerId == request.auth.uid);
-      allow create: if isSignedIn();
+      allow create: if false; // created via /api/leads (rate-limited, server-validated)
       allow update, delete: if isAdmin();
     }
 
@@ -284,8 +297,8 @@ service cloud.firestore {
     // Support & platform administration
     // -------------------------------------------------------------------
     match /supportTickets/{id} {
-      allow read, create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow read: if isStaff();
+      allow read: if isStaff() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
       allow update: if isStaff();
       allow delete: if false;
     }

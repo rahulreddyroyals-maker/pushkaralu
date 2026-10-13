@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { rateLimitUser } from "@/lib/apiRateLimit";
 import { getServerUser } from "@/lib/auth/session";
 import { leadInputSchema } from "@/features/leads/schemas";
 import { createLead, listLeadsForProvider } from "@/features/leads/api";
@@ -19,6 +20,8 @@ import { getCatalog } from "@/lib/catalog/server/repository";
 export async function POST(req: NextRequest) {
   const user = await getServerUser();
   if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  const limited = await rateLimitUser(user.uid, "leads", 20);
+  if (limited) return limited;
 
   const body = await req.json().catch(() => null);
   const parsed = leadInputSchema.safeParse(body);

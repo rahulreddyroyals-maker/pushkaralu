@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { rateLimitUser } from "@/lib/apiRateLimit";
 import { getServerUser } from "@/lib/auth/session";
 import { hotelInputSchema } from "@/features/hotels/schemas";
 import { createHotel } from "@/features/hotels/api";
@@ -16,6 +17,8 @@ export async function POST(req: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  const limited = await rateLimitUser(user.uid, "listing-create", 10);
+  if (limited) return limited;
 
   const body = await req.json().catch(() => null);
   const parsed = hotelInputSchema.safeParse(body);

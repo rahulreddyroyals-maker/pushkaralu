@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { rateLimitUser } from "@/lib/apiRateLimit";
 import { getServerUser } from "@/lib/auth/session";
 import { purohitInputSchema } from "@/features/purohits/schemas";
 import { createPurohit } from "@/features/purohits/api";
@@ -7,6 +8,8 @@ import { writeAuditLog } from "@/lib/audit/log";
 export async function POST(req: NextRequest) {
   const user = await getServerUser();
   if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  const limited = await rateLimitUser(user.uid, "listing-create", 10);
+  if (limited) return limited;
 
   const body = await req.json().catch(() => null);
   const parsed = purohitInputSchema.safeParse(body);

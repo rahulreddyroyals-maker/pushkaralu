@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { rateLimitUser } from "@/lib/apiRateLimit";
 import { getServerUser } from "@/lib/auth/session";
 import { reviewInputSchema } from "@/features/reviews/schemas";
 import { createReview, listReviews } from "@/features/reviews/api";
@@ -13,6 +14,8 @@ import type { LeadProviderType } from "@/features/leads/types";
 export async function POST(req: NextRequest) {
   const user = await getServerUser();
   if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  const limited = await rateLimitUser(user.uid, "reviews", 10);
+  if (limited) return limited;
 
   const body = await req.json().catch(() => null);
   const parsed = reviewInputSchema.safeParse(body);

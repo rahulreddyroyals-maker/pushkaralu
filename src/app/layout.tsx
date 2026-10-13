@@ -6,9 +6,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { organization, webSite } from "@/lib/seo/jsonld";
 import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
 import { AuthProvider } from "@/features/auth/AuthProvider";
-import { cookies } from "next/headers";
 import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
-import { LANG_COOKIE } from "@/lib/i18n/lang-cookie";
 
 /**
  * Using the system font stack (defined in globals.css) instead of
@@ -27,14 +25,13 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", images: [DEFAULT_SEO.defaultOgImage] },
 };
 
-export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const lang = (await cookies()).get(LANG_COOKIE)?.value === "te" ? "te" : "en";
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang={lang} className="h-full antialiased">
+    <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col font-sans">
         <JsonLd data={[webSite(APP_NAME), organization(APP_NAME)]} />
         <AnalyticsTracker />
-        <LocaleProvider initialLang={lang}>
+        <LocaleProvider>
           <AuthProvider>{children}</AuthProvider>
         </LocaleProvider>
       </body>

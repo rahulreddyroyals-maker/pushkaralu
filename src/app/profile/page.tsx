@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getServerUser } from "@/lib/auth/session";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { SiteShell } from "@/components/layout/SiteShell";
+import { DeleteAccount } from "@/features/auth/components/DeleteAccount";
 import { ProfileForm } from "@/features/auth/components/ProfileForm";
 import type { UserProfile } from "@/features/auth/types";
 
@@ -30,6 +31,7 @@ export default async function ProfilePage() {
           email={serverUser.email}
           role={serverUser.role}
         />
+        <DeleteAccount />
       </div>
     </SiteShell>
   );

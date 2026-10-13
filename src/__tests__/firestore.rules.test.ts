@@ -140,9 +140,9 @@ describe("hotels/{id} — provider-owned listing rules", () => {
     await assertSucceeds(updateDoc(doc(ownerA.firestore(), "hotels/hotel-1"), { name: "River View Deluxe" }));
   });
 
-  it("allows anyone (even unauthenticated) to read a hotel listing — public directory content", async () => {
+  it("allows anyone (even unauthenticated) to read a VERIFIED hotel listing — public directory content", async () => {
     await testEnv.withSecurityRulesDisabled(async (ctx) => {
-      await setDoc(doc(ctx.firestore(), "hotels/hotel-1"), { ownerId: "owner-a", name: "River View" });
+      await setDoc(doc(ctx.firestore(), "hotels/hotel-1"), { ownerId: "owner-a", name: "River View", approvalStatus: "VERIFIED" });
     });
     const anon = testEnv.unauthenticatedContext();
     await assertSucceeds(getDoc(doc(anon.firestore(), "hotels/hotel-1")));
@@ -162,5 +162,35 @@ describe("events/{id}/ghats — crowd status moderation", () => {
     await assertSucceeds(
       setDoc(doc(moderator.firestore(), "events/ev1/ghats/ghat1"), { crowdStatus: "HIGH" })
     );
+  });
+});
+
+describe("Sprint 12 hardening — no self-approval, no forged writes", () => {
+  it("denies a user creating a hotel that is already VERIFIED", async () => {
+    const u = testEnv.authenticatedContext("u1", { role: "USER" });
+    await assertFails(setDoc(doc(u.firestore(), "hotels/h-x"), { ownerId: "u1", approvalStatus: "VERIFIED", name: "Fake" }));
+  });
+
+  it("denies a HOTEL_OWNER changing their own approvalStatus", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), "hotels/hotel-2"), { ownerId: "owner-a", name: "A", approvalStatus: "PENDING" });
+    });
+    const o = testEnv.authenticatedContext("owner-a", { role: "HOTEL_OWNER" });
+    await assertFails(updateDoc(doc(o.firestore(), "hotels/hotel-2"), { approvalStatus: "VERIFIED" }));
+  });
+
+  it("denies a family-group member writing the group directly", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), "familyGroups/g1"), { memberUids: ["m1"], name: "G" });
+    });
+    const m = testEnv.authenticatedContext("m1", { role: "USER" });
+    await assertFails(updateDoc(doc(m.firestore(), "familyGroups/g1"), { memberUids: ["m1", "evil"] }));
+  });
+
+  it("denies direct client creation of bookings, leads and lost-and-found reports", async () => {
+    const u = testEnv.authenticatedContext("u1", { role: "USER" });
+    await assertFails(setDoc(doc(u.firestore(), "bookings/b1"), { userId: "u1", amount: 1 }));
+    await assertFails(setDoc(doc(u.firestore(), "leads/l1"), { userId: "u1" }));
+    await assertFails(setDoc(doc(u.firestore(), "lostFoundReports/r1"), { reporterUid: "u1" }));
   });
 });

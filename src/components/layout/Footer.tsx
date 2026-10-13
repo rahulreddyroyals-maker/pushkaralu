@@ -66,6 +66,9 @@ export function Footer() {
             <Link href="/privacy" className="hover:text-white">
               <Tr>Privacy</Tr>
             </Link>
+            <Link href="/delete-account" className="hover:text-white">
+              <Tr>Delete account</Tr>
+            </Link>
             <Link href="/refund-policy" className="hover:text-white">
               <Tr>Refund Policy</Tr>
             </Link>
