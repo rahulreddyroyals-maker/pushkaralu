@@ -6,21 +6,23 @@
  * See docs/DESIGN_SYSTEM.md for the full rationale.
  */
 :root {
-  --background: #faf8f4;
-  --foreground: #16262e;
+  --background: #fff9ee;
+  --foreground: #2b1810;
 
   /* Brand */
-  --color-river-deep: #0e4c5c;
-  --color-river-current: #1c7c93;
-  --color-river-mist: #dceef2;
-  --color-saffron: #e8961f;
-  --color-saffron-light: #fdf0dc;
-  --color-ember: #c4501f;
-  --color-surface: #faf8f4;
-  --color-surface-raised: #ffffff;
-  --color-ink: #16262e;
-  --color-ink-muted: #4b5c63;
-  --color-border: #e4ddd2;
+  --color-river-deep: #7a1d1d;
+  --color-river-current: #b8432a;
+  --color-river-mist: #fdebcf;
+  --color-saffron: #c4620a;
+  --color-saffron-light: #fff0d2;
+  --color-ember: #a8381a;
+  --color-gold: #c99a2e;
+  --color-gold-light: #f6e2a8;
+  --color-surface: #fff9ee;
+  --color-surface-raised: #fffdf8;
+  --color-ink: #2b1810;
+  --color-ink-muted: #6a4f42;
+  --color-border: #ead9b8;
 
   /* Status (crowd levels, booking states — semantically separate from brand) */
   --color-status-low: #2f9e5b;
@@ -30,8 +32,8 @@
 
   /* Radii & shadow */
   --radius-card: 0.75rem;
-  --shadow-card: 0 1px 2px rgba(22, 38, 46, 0.04), 0 8px 24px -12px rgba(14, 76, 92, 0.18);
-  --shadow-card-hover: 0 4px 10px rgba(22, 38, 46, 0.06), 0 16px 32px -12px rgba(14, 76, 92, 0.24);
+  --shadow-card: 0 1px 2px rgba(43, 24, 16, 0.05), 0 8px 24px -12px rgba(122, 29, 29, 0.22);
+  --shadow-card-hover: 0 4px 10px rgba(43, 24, 16, 0.07), 0 16px 32px -12px rgba(122, 29, 29, 0.28);
 }
 
 @theme inline {
@@ -43,6 +45,8 @@
   --color-saffron: var(--color-saffron);
   --color-saffron-light: var(--color-saffron-light);
   --color-ember: var(--color-ember);
+  --color-gold: var(--color-gold);
+  --color-gold-light: var(--color-gold-light);
   --color-surface: var(--color-surface);
   --color-surface-raised: var(--color-surface-raised);
   --color-ink: var(--color-ink);
@@ -53,22 +57,14 @@
   --color-status-high: var(--color-status-high);
   --color-status-critical: var(--color-status-critical);
 
+  --font-serif: Palatino, "Palatino Linotype", "Iowan Old Style", Georgia, "Times New Roman", serif;
+
   /* Type: geometric sans display/body, monospace utility for data/status/timestamps */
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0d1a1f;
-    --foreground: #f2ede4;
-    --color-surface: #0d1a1f;
-    --color-surface-raised: #12262d;
-    --color-border: #234049;
-    --color-ink: #f2ede4;
-    --color-ink-muted: #a9bcc2;
-  }
-}
+/* Light devotional theme only: the cream/maroon palette is not designed for dark mode. */
 
 body {
   background: var(--background);
@@ -81,3 +77,10 @@ body {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.01em;
 }
+
+/* Devotional touches: serif headings, gold rule, mandala/lotus helpers */
+h1, h2 { font-family: var(--font-serif); letter-spacing: 0; }
+.gold-rule { height: 3px; background: linear-gradient(90deg, transparent, var(--color-gold), var(--color-saffron), var(--color-gold), transparent); }
+.om-divider { display: flex; align-items: center; gap: 0.75rem; color: var(--color-gold); }
+.om-divider::before, .om-divider::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--color-gold)); }
+.om-divider::after { transform: scaleX(-1); }

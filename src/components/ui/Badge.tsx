@@ -11,7 +11,7 @@ interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 
 const toneClasses: Record<Tone, string> = {
   neutral: "bg-black/[.05] text-ink-muted",
-  saffron: "bg-saffron-light text-[#8a5410]",
+  saffron: "bg-saffron-light text-[#7a4208]",
   success: "bg-[rgba(47,158,91,0.12)] text-status-low",
   warning: "bg-[rgba(217,166,28,0.14)] text-[#8a6c10]",
   danger: "bg-[rgba(201,59,59,0.12)] text-status-critical",

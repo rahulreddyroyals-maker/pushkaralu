@@ -8,7 +8,7 @@ export function DirectionsButton({ location, label = "Get directions" }: { locat
       href={directionsUrl(location)}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-river-deep px-5 text-sm font-medium text-white hover:bg-[#0b3e4b]"
+      className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-river-deep px-5 text-sm font-medium text-white hover:bg-[#5e1515]"
     >
       <span aria-hidden>🧭</span> {label}
     </a>

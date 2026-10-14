@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils/cn";
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { useTr } from "@/lib/i18n/LocaleProvider";
 import { track } from "@/lib/analytics/client";
 
@@ -13,10 +14,7 @@ interface SearchBarProps {
   size?: "sm" | "lg";
 }
 
-/**
- * Presentational search shell only — wired to real search (Module 17)
- * in a later sprint. `onSearch` is optional so it renders standalone here.
- */
+/** Navigates to /search?q=… unless an `onSearch` handler overrides it. */
 export function SearchBar({
   placeholder = "Search ghats, temples, hotels, purohits...",
   defaultValue = "",
@@ -25,12 +23,14 @@ export function SearchBar({
   size = "lg",
 }: SearchBarProps) {
   const tr = useTr();
+  const router = useRouter();
   const [value, setValue] = useState(defaultValue);
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (value.trim()) track({ type: "search", term: value.trim() });
-    onSearch?.(value.trim());
+    if (onSearch) onSearch(value.trim());
+    else router.push(`/search?q=${encodeURIComponent(value.trim())}`);
   }
 
   return (
@@ -49,6 +49,7 @@ export function SearchBar({
       </span>
       <input
         type="search"
+        aria-label={tr("Search")}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={tr(placeholder)}
@@ -59,7 +60,7 @@ export function SearchBar({
       />
       <button
         type="submit"
-        className="rounded-full bg-saffron px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#d6870f]"
+        className="rounded-full bg-saffron px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-ember"
       >
         {tr("Search")}
       </button>

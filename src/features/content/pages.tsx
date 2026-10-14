@@ -176,7 +176,7 @@ export async function ContentDetailPage({ sectionKey, slug, lang }: { sectionKey
 
         {sectionKey === "service-pages" && rec.ctaPath && (
           <div className="mt-8">
-            <Link href={localizedPath(rec.ctaPath, lang)} className="inline-flex rounded-lg bg-river-deep px-5 py-3 text-sm font-medium text-white hover:bg-[#0b3e4b]">
+            <Link href={localizedPath(rec.ctaPath, lang)} className="inline-flex rounded-lg bg-river-deep px-5 py-3 text-sm font-medium text-white hover:bg-[#5e1515]">
               {pickLang(rec.ctaLabel, lang) || t.read} →
             </Link>
           </div>

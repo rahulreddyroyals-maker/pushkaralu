@@ -116,7 +116,7 @@ export function EmergencyKindSection({ kind, items, nowMs }: Props) {
                       href={directionsUrl(item.location)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-river-deep px-4 text-sm font-medium text-white hover:bg-[#0b3e4b]"
+                      className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-river-deep px-4 text-sm font-medium text-white hover:bg-[#5e1515]"
                     >
                       <span aria-hidden>🧭</span> Navigate
                     </a>

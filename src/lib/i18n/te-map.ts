@@ -16,6 +16,7 @@ export const TE: Record<string, string> = {
   "Refund Policy": "రీఫండ్ విధానం", Discover: "అన్వేషించండి", Services: "సేవలు", Learn: "తెలుసుకోండి", Safety: "భద్రత", Business: "వ్యాపారం",
   "All rights reserved.": "అన్ని హక్కులూ ఆరక్షితం.",
   // account
+  Language: "భాష", "View profile": "ప్రొఫైల్ చూడండి", "Type a name to search hotels, temples, purohits and local businesses.": "హోటళ్లు, ఆలయాలు, పురోహితులు, స్థానిక వ్యాపారాల పేరు టైప్ చేయండి.",
   "Sign in": "సైన్ ఇన్", "Sign out": "సైన్ అవుట్", "Register business": "వ్యాపారం నమోదు", Admin: "అడ్మిన్", Profile: "ప్రొఫైల్",
   "Create account": "ఖాతా సృష్టించండి", "Creating account...": "ఖాతా సృష్టిస్తోంది...", "Create your account": "మీ ఖాతాను సృష్టించండి",
   "Join Pushkaralu to book services and save your favorites.": "సేవలు బుక్ చేయడానికి, ఇష్టమైనవి దాచుకోవడానికి పుష్కరాలులో చేరండి.",

@@ -62,7 +62,7 @@ export default async function EventDetailPage({ params }: PageProps) {
         <div className="mt-8">
           <Link
             href={`/events/${event.id}/ghats`}
-            className="inline-flex items-center gap-2 rounded-lg bg-river-deep px-5 py-3 text-sm font-medium text-white hover:bg-[#0b3e4b]"
+            className="inline-flex items-center gap-2 rounded-lg bg-river-deep px-5 py-3 text-sm font-medium text-white hover:bg-[#5e1515]"
           >
             Browse ghats for this event →
           </Link>
