@@ -1,0 +1,2539 @@
+diff --git a/.env.example b/.env.example
+index 4d57ec2..caa7895 100644
+--- a/.env.example
++++ b/.env.example
+@@ -34,3 +34,8 @@ RAZORPAY_WEBHOOK_SECRET=
+ # --- App ---
+ NEXT_PUBLIC_SITE_URL=http://localhost:3000
+ NEXT_PUBLIC_DEFAULT_LOCALE=en
++
++# --- AI Assistant (Groq, free tier: create a key at https://console.groq.com/keys) ---
++AI_PROVIDER=groq
++GROQ_API_KEY=
++# AI_MODEL=llama-3.3-70b-versatile
+diff --git a/docs/SPRINT_10.md b/docs/SPRINT_10.md
+index 1fc81c1..68e7733 100644
+--- a/docs/SPRINT_10.md
++++ b/docs/SPRINT_10.md
+@@ -24,9 +24,9 @@ Language is detected from the message (falls back to the UI toggle). The system
+ ## Environment
+ | Variable | Purpose |
+ |---|---|
+-| `AI_PROVIDER` | `anthropic` (default) or `openai` |
+-| `AI_MODEL` | **required** model id from your provider console |
+-| `AI_API_KEY` | key (or `ANTHROPIC_API_KEY` / `OPENAI_API_KEY`) — server only, never `NEXT_PUBLIC_` |
++| `AI_PROVIDER` | `groq` (default, free tier), `anthropic`, or `openai` |
++| `AI_MODEL` | model id; defaults to `llama-3.3-70b-versatile` for groq, required for others |
++| `AI_API_KEY` | key (or `GROQ_API_KEY` / `ANTHROPIC_API_KEY` / `OPENAI_API_KEY`) — server only, never `NEXT_PUBLIC_` |
+ | `AI_BASE_URL` | optional gateway / compatible endpoint |
+ | `AI_ENABLED` | `false` = kill switch |
+ | `AI_TIMEOUT_MS` | default 30000 |
+diff --git a/firestore.indexes.json b/firestore.indexes.json
+index 0d6b7f6..3c48ebe 100644
+--- a/firestore.indexes.json
++++ b/firestore.indexes.json
+@@ -4,242 +4,1989 @@
+       "collectionGroup": "events",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "published", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "ghats",
+       "queryScope": "COLLECTION_GROUP",
+       "fields": [
+-        { "fieldPath": "published", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "ghats",
+       "queryScope": "COLLECTION_GROUP",
+       "fields": [
+-        { "fieldPath": "published", "order": "ASCENDING" },
+-        { "fieldPath": "facilities", "arrayConfig": "CONTAINS" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "facilities",
++          "arrayConfig": "CONTAINS"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "ghats",
+       "queryScope": "COLLECTION_GROUP",
+       "fields": [
+-        { "fieldPath": "published", "order": "ASCENDING" },
+-        { "fieldPath": "nameLower", "order": "ASCENDING" }
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "temples",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "published", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "temples",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "published", "order": "ASCENDING" },
+-        { "fieldPath": "nameLower", "order": "ASCENDING" }
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "announcements",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "published", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "hotels",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "approvalStatus", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "approvalStatus",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "hotels",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "approvalStatus", "order": "ASCENDING" },
+-        { "fieldPath": "amenities", "arrayConfig": "CONTAINS" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "approvalStatus",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "amenities",
++          "arrayConfig": "CONTAINS"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "hotels",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "approvalStatus", "order": "ASCENDING" },
+-        { "fieldPath": "nameLower", "order": "ASCENDING" }
++        {
++          "fieldPath": "approvalStatus",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "hotels",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "ownerId", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "ownerId",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "purohits",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "approvalStatus", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "approvalStatus",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "purohits",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "approvalStatus", "order": "ASCENDING" },
+-        { "fieldPath": "ritualIds", "arrayConfig": "CONTAINS" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "approvalStatus",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "ritualIds",
++          "arrayConfig": "CONTAINS"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "purohits",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "approvalStatus", "order": "ASCENDING" },
+-        { "fieldPath": "languages", "arrayConfig": "CONTAINS" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "approvalStatus",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "languages",
++          "arrayConfig": "CONTAINS"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "purohits",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "approvalStatus", "order": "ASCENDING" },
+-        { "fieldPath": "nameLower", "order": "ASCENDING" }
++        {
++          "fieldPath": "approvalStatus",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "purohits",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "userId", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "userId",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "rituals",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "published", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "rituals",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "published", "order": "ASCENDING" },
+-        { "fieldPath": "category", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "category",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "businesses",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "approvalStatus", "order": "ASCENDING" },
+-        { "fieldPath": "category", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "approvalStatus",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "category",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "businesses",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "approvalStatus", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "approvalStatus",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "businesses",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "approvalStatus", "order": "ASCENDING" },
+-        { "fieldPath": "nameLower", "order": "ASCENDING" }
++        {
++          "fieldPath": "approvalStatus",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "businesses",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "approvalStatus", "order": "ASCENDING" },
+-        { "fieldPath": "category", "order": "ASCENDING" },
+-        { "fieldPath": "nameLower", "order": "ASCENDING" }
++        {
++          "fieldPath": "approvalStatus",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "category",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "businesses",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "ownerId", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "ownerId",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "leads",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "providerId", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "providerId",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "reviews",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "providerId", "order": "ASCENDING" },
+-        { "fieldPath": "providerType", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "providerId",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "providerType",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "bookings",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "userId", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "userId",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "bookings",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "providerId", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "providerId",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "bookings",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "providerOwnerId", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "providerOwnerId",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
+       ]
+     },
+     {
+       "collectionGroup": "bookings",
+       "queryScope": "COLLECTION",
+       "fields": [
+-        { "fieldPath": "status", "order": "ASCENDING" },
+-        { "fieldPath": "createdAt", "order": "DESCENDING" }
++        {
++          "fieldPath": "status",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "transportServices",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "transportServices",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "transportServices",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "kind",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "transportServices",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "kind",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "boatOperators",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "boatOperators",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "boats",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "boats",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "boats",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "operatorId",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "boats",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "operatorId",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "boats",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "boatType",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "boats",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "boatType",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "boatRoutes",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "boatRoutes",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "boatRoutes",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "operatorId",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "boatRoutes",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "operatorId",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "boatRoutes",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "active",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "boatRoutes",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "active",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "parkingLocations",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "parkingLocations",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "parkingLocations",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "status",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "parkingLocations",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "status",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "parkingLocations",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "parkingType",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "parkingLocations",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "parkingType",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "restaurants",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "restaurants",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "restaurants",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "dietType",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "restaurants",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "dietType",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "restaurants",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "priceCategory",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "restaurants",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "priceCategory",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "restaurants",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "familyFriendly",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "restaurants",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "familyFriendly",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "tourismPlaces",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "tourismPlaces",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "tourismPlaces",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "kind",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "tourismPlaces",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "kind",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "itineraries",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "itineraries",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "itineraries",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "tripType",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "itineraries",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "tripType",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "travelPackages",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "travelPackages",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "travelPackages",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "itineraryId",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "travelPackages",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "itineraryId",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "emergencyServices",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "emergencyServices",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "emergencyServices",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "kind",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "emergencyServices",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "kind",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentArticles",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentArticles",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentArticles",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "topic",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentArticles",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "topic",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentGuides",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentGuides",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentGuides",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "topic",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentGuides",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "topic",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentFaqs",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentFaqs",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentFaqs",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "topic",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentFaqs",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "topic",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentLocations",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentLocations",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentLocations",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "topic",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentLocations",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "topic",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentServices",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentServices",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentServices",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "topic",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "contentServices",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "topic",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "advertisers",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "advertisers",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "adCampaigns",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "adCampaigns",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "adCampaigns",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "status",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "adCampaigns",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "status",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "adCampaigns",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "placement",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "adCampaigns",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "placement",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "adPlacements",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "adPlacements",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "ghats",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "ghats",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "facilities",
++          "arrayConfig": "CONTAINS"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "ghats",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "published",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "nameLower",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "lostFoundReports",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "reporterId",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "lostFoundReports",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "status",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "lostFoundReports",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "status",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "category",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "lostFoundReports",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "status",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "reportType",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "lostFoundReports",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "status",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "category",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "reportType",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "lostFoundResponses",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "reportId",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "familyAlerts",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "groupId",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "status",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "familyAlerts",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "senderId",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "familyAlerts",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "escalated",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "status",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "leads",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "providerType",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "DESCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "notificationCampaigns",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "status",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "scheduledFor",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "notificationCampaigns",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "status",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "leaseUntil",
++          "order": "ASCENDING"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "notificationCampaigns",
++      "queryScope": "COLLECTION",
++      "fields": [
++        {
++          "fieldPath": "createdBy",
++          "order": "ASCENDING"
++        },
++        {
++          "fieldPath": "createdAt",
++          "order": "ASCENDING"
++        }
+       ]
+     }
+   ],
+-  "fieldOverrides": []
+-}
+\ No newline at end of file
++  "fieldOverrides": [
++    {
++      "collectionGroup": "items",
++      "fieldPath": "campaignId",
++      "indexes": [
++        {
++          "order": "ASCENDING",
++          "queryScope": "COLLECTION"
++        },
++        {
++          "order": "DESCENDING",
++          "queryScope": "COLLECTION"
++        },
++        {
++          "order": "ASCENDING",
++          "queryScope": "COLLECTION_GROUP"
++        }
++      ]
++    },
++    {
++      "collectionGroup": "items",
++      "fieldPath": "read",
++      "indexes": [
++        {
++          "order": "ASCENDING",
++          "queryScope": "COLLECTION"
++        },
++        {
++          "order": "DESCENDING",
++          "queryScope": "COLLECTION"
++        },
++        {
++          "order": "ASCENDING",
++          "queryScope": "COLLECTION_GROUP"
++        }
++      ]
++    }
++  ]
++}
+diff --git a/src/app/admin/emergency/page.tsx b/src/app/admin/emergency/page.tsx
+index ab110cc..1393573 100644
+--- a/src/app/admin/emergency/page.tsx
++++ b/src/app/admin/emergency/page.tsx
+@@ -27,6 +27,7 @@ export default async function AdminEmergencyPage() {
+     listEscalatedAlerts(familyDeps, actor),
+   ]);
+ 
++  // eslint-disable-next-line react-hooks/purity -- server component; evaluated once per request
+   const now = Date.now();
+   const isStale = (r: Record<string, unknown>) => {
+     const t = Date.parse(String(r.verifiedOn ?? ""));
+diff --git a/src/app/emergency/page.tsx b/src/app/emergency/page.tsx
+index f5bbc72..8cf00ab 100644
+--- a/src/app/emergency/page.tsx
++++ b/src/app/emergency/page.tsx
+@@ -20,6 +20,7 @@ export const metadata = {
+  */
+ export default async function EmergencyPage() {
+   const results = await Promise.all(EMERGENCY_KINDS.map((kind) => loadPublicList("emergency-services", { pageSize: 24, filters: { kind } })));
++  // eslint-disable-next-line react-hooks/purity -- server component; evaluated once per request
+   const nowMs = Date.now();
+ 
+   return (
+diff --git a/src/app/ghats/page.tsx b/src/app/ghats/page.tsx
+new file mode 100644
+index 0000000..259d620
+--- /dev/null
++++ b/src/app/ghats/page.tsx
+@@ -0,0 +1,48 @@
++import Link from "next/link";
++import { redirect } from "next/navigation";
++import { SiteShell } from "@/components/layout/SiteShell";
++import { Breadcrumb, EmptyState } from "@/components/ui";
++import { listEvents } from "@/features/events/api";
++import { ROUTES } from "@/config/app";
++
++export const dynamic = "force-dynamic";
++
++export const metadata = {
++  title: "Ghats",
++  description: "Bathing ghats with facilities, parking and the latest staff-reported crowd status.",
++};
++
++/**
++ * Ghats belong to an event (/events/[id]/ghats). This entry point, linked from
++ * the main menu, goes straight to the ghats when exactly one event is published
++ * and otherwise asks which event the pilgrim means.
++ */
++export default async function GhatsIndexPage() {
++  const { items } = await listEvents({ pageSize: 24 });
++  if (items.length === 1) redirect(`/events/${items[0]!.id}/ghats`);
++
++  return (
++    <SiteShell>
++      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
++        <Breadcrumb items={[{ label: "Home", href: ROUTES.home }, { label: "Ghats" }]} />
++        <h1 className="mt-3 text-2xl font-semibold text-ink">Ghats</h1>
++        <p className="mt-1 text-ink-muted">Choose an event to see its ghats, facilities and the latest crowd update.</p>
++        {items.length === 0 ? (
++          <div className="mt-8">
++            <EmptyState title="No events published yet" description="Ghats will appear here once an event is published." />
++          </div>
++        ) : (
++          <ul className="mt-6 flex flex-col gap-3">
++            {items.map((e) => (
++              <li key={e.id}>
++                <Link href={`/events/${e.id}/ghats`} className="block rounded-[var(--radius-card)] border border-border bg-surface-raised p-4 font-medium text-river-deep hover:bg-river-mist">
++                  {e.name.en}
++                </Link>
++              </li>
++            ))}
++          </ul>
++        )}
++      </div>
++    </SiteShell>
++  );
++}
+diff --git a/src/components/ads/AdSlot.tsx b/src/components/ads/AdSlot.tsx
+index c6cc658..931e6b8 100644
+--- a/src/components/ads/AdSlot.tsx
++++ b/src/components/ads/AdSlot.tsx
+@@ -1,4 +1,5 @@
+ "use client";
++/* eslint-disable @next/next/no-img-element -- ad creatives are advertiser-hosted external images; next/image would need every ad host allow-listed */
+ 
+ import { useEffect, useRef, useState } from "react";
+ import { firstInSession, track } from "@/lib/analytics/client";
+@@ -39,7 +40,7 @@ function AdItem({ ad, lang }: { ad: ServedAd; lang: "en" | "te" }) {
+     return (
+       <a {...common} className="block overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface-raised">
+         <div className="flex items-center justify-between px-3 py-1">{label}</div>
+-        {ad.image && /* eslint-disable-next-line @next/next/no-img-element */ <img src={ad.image} alt={ad.headline} loading="lazy" className="max-h-48 w-full object-cover" />}
++        {ad.image && <img src={ad.image} alt={ad.headline} loading="lazy" className="max-h-48 w-full object-cover" />}
+         <p className="px-3 py-2 text-sm font-medium text-ink">{ad.headline}</p>
+       </a>
+     );
+@@ -47,7 +48,7 @@ function AdItem({ ad, lang }: { ad: ServedAd; lang: "en" | "te" }) {
+   if (ad.format === "HOMEPAGE_PROMOTION") {
+     return (
+       <a {...common} className="flex flex-col gap-2 rounded-[var(--radius-card)] border border-saffron/40 bg-surface-raised p-4 sm:flex-row sm:items-center">
+-        {ad.image && /* eslint-disable-next-line @next/next/no-img-element */ <img src={ad.image} alt="" loading="lazy" className="h-24 w-full rounded-lg object-cover sm:w-40" />}
++        {ad.image && <img src={ad.image} alt="" loading="lazy" className="h-24 w-full rounded-lg object-cover sm:w-40" />}
+         <div className="flex-1">
+           {label}
+           <p className="mt-1 text-lg font-semibold text-ink">{ad.headline}</p>
+@@ -60,7 +61,7 @@ function AdItem({ ad, lang }: { ad: ServedAd; lang: "en" | "te" }) {
+   // SPONSORED_LISTING / SPONSORED_ARTICLE — card styled like normal results but always labelled.
+   return (
+     <a {...common} className="flex gap-3 rounded-[var(--radius-card)] border border-border bg-surface-raised p-3">
+-      {ad.creative?.image && /* eslint-disable-next-line @next/next/no-img-element */ <img src={ad.creative.image} alt="" loading="lazy" className="h-20 w-20 rounded-lg object-cover" />}
++      {ad.creative?.image && <img src={ad.creative.image} alt="" loading="lazy" className="h-20 w-20 rounded-lg object-cover" />}
+       <div className="min-w-0">
+         {label}
+         <p className="mt-1 font-semibold text-ink">{ad.creative?.title ?? ad.headline}</p>
+diff --git a/src/components/content/Markdown.tsx b/src/components/content/Markdown.tsx
+index ffb07a1..08678d7 100644
+--- a/src/components/content/Markdown.tsx
++++ b/src/components/content/Markdown.tsx
+@@ -2,59 +2,51 @@ import Link from "next/link";
+ import type { ReactNode } from "react";
+ import { parseMarkdown, type Block, type Inline } from "@/lib/content/markdown";
+ 
+-/** Set only for the duration of one synchronous Markdown render (see Markdown below). */
+-let sponsoredLinks = false;
+-
+-export function renderInline(nodes: Inline[]): ReactNode[] {
++export function renderInline(nodes: Inline[], sponsored = false): ReactNode[] {
+   return nodes.map((n, i) => {
+     switch (n.t) {
+       case "text":
+         return n.v;
+       case "strong":
+-        return <strong key={i}>{renderInline(n.c)}</strong>;
++        return <strong key={i}>{renderInline(n.c, sponsored)}</strong>;
+       case "em":
+-        return <em key={i}>{renderInline(n.c)}</em>;
++        return <em key={i}>{renderInline(n.c, sponsored)}</em>;
+       case "code":
+         return <code key={i} className="rounded bg-river-mist px-1 py-0.5 text-[0.9em]">{n.v}</code>;
+       case "link":
+         return n.external ? (
+-          <a key={i} href={n.href} className="text-river-deep underline" {...(n.href.startsWith("http") ? { target: "_blank", rel: sponsoredLinks ? "sponsored noopener noreferrer" : "noopener noreferrer" } : {})}>
+-            {renderInline(n.c)}
++          <a key={i} href={n.href} className="text-river-deep underline" {...(n.href.startsWith("http") ? { target: "_blank", rel: sponsored ? "sponsored noopener noreferrer" : "noopener noreferrer" } : {})}>
++            {renderInline(n.c, sponsored)}
+           </a>
+         ) : (
+-          <Link key={i} href={n.href} className="text-river-deep underline">{renderInline(n.c)}</Link>
++          <Link key={i} href={n.href} className="text-river-deep underline">{renderInline(n.c, sponsored)}</Link>
+         );
+     }
+   });
+ }
+ 
+-function renderBlock(b: Block, i: number): ReactNode {
++function renderBlock(b: Block, i: number, sponsored: boolean): ReactNode {
+   switch (b.t) {
+     case "heading": {
+       const cls = b.level === 2 ? "mt-8 text-xl font-semibold text-ink" : "mt-6 text-lg font-semibold text-ink";
+       const Tag = (b.level === 2 ? "h2" : b.level === 3 ? "h3" : "h4") as "h2" | "h3" | "h4";
+-      return <Tag key={i} id={b.id} className={`${cls} scroll-mt-24`}>{renderInline(b.c)}</Tag>;
++      return <Tag key={i} id={b.id} className={`${cls} scroll-mt-24`}>{renderInline(b.c, sponsored)}</Tag>;
+     }
+     case "p":
+-      return <p key={i} className="mt-4 leading-7 text-ink">{renderInline(b.c)}</p>;
++      return <p key={i} className="mt-4 leading-7 text-ink">{renderInline(b.c, sponsored)}</p>;
+     case "ul":
+-      return <ul key={i} className="mt-4 list-disc space-y-1 pl-6 text-ink">{b.items.map((it, j) => <li key={j}>{renderInline(it)}</li>)}</ul>;
++      return <ul key={i} className="mt-4 list-disc space-y-1 pl-6 text-ink">{b.items.map((it, j) => <li key={j}>{renderInline(it, sponsored)}</li>)}</ul>;
+     case "ol":
+-      return <ol key={i} className="mt-4 list-decimal space-y-1 pl-6 text-ink">{b.items.map((it, j) => <li key={j}>{renderInline(it)}</li>)}</ol>;
++      return <ol key={i} className="mt-4 list-decimal space-y-1 pl-6 text-ink">{b.items.map((it, j) => <li key={j}>{renderInline(it, sponsored)}</li>)}</ol>;
+     case "quote":
+-      return <blockquote key={i} className="mt-4 border-l-4 border-saffron pl-4 text-ink-muted">{renderInline(b.c)}</blockquote>;
++      return <blockquote key={i} className="mt-4 border-l-4 border-saffron pl-4 text-ink-muted">{renderInline(b.c, sponsored)}</blockquote>;
+     case "hr":
+       return <hr key={i} className="my-8 border-border" />;
+   }
+ }
+ 
+ /** Server component: Markdown source -> React elements. No raw HTML is ever emitted. */
+-/** `sponsored` marks external links rel="sponsored" (paid content). The flag is set and cleared around one synchronous render. */
++/** `sponsored` marks external links rel="sponsored" (paid content). */
+ export function Markdown({ source, sponsored = false }: { source: string; sponsored?: boolean }) {
+-  sponsoredLinks = sponsored;
+-  try {
+-    return <div>{parseMarkdown(source).map(renderBlock)}</div>;
+-  } finally {
+-    sponsoredLinks = false;
+-  }
++  return <div>{parseMarkdown(source).map((b, i) => renderBlock(b, i, sponsored))}</div>;
+ }
+diff --git a/src/components/lostFound/ReportForm.tsx b/src/components/lostFound/ReportForm.tsx
+index f915d16..6fec12a 100644
+--- a/src/components/lostFound/ReportForm.tsx
++++ b/src/components/lostFound/ReportForm.tsx
+@@ -1,6 +1,7 @@
+ "use client";
+ 
+ import { useState } from "react";
++import Link from "next/link";
+ import { useRouter } from "next/navigation";
+ import { Button, Card, Input, Select } from "@/components/ui";
+ import { createReportSchema } from "@/features/lostFound/schemas";
+@@ -65,7 +66,7 @@ export function ReportForm() {
+     <Card padding="lg" className="flex flex-col gap-5">
+       {urgent && (
+         <p role="note" className="rounded-lg bg-[rgba(201,59,59,0.08)] p-3 text-sm text-ink">
+-          If someone is missing or in danger, <a className="font-semibold text-status-critical underline" href="/emergency">call emergency services now</a>. Reports about people are reviewed first, but review is not instant.
++          If someone is missing or in danger, <Link className="font-semibold text-status-critical underline" href="/emergency">call emergency services now</Link>. Reports about people are reviewed first, but review is not instant.
+         </p>
+       )}
+       <p className="text-sm text-ink-muted">
+diff --git a/src/features/ads/ads.test.ts b/src/features/ads/ads.test.ts
+index 5fba7e9..f1f2efe 100644
+--- a/src/features/ads/ads.test.ts
++++ b/src/features/ads/ads.test.ts
+@@ -1,5 +1,5 @@
+ import { describe, it, expect } from "vitest";
+-import { campaignTarget, effectiveStatus, estimatedSpend, selectCampaigns, type AdvertiserRec, type CampaignRec } from "./select";
++import { campaignTarget, effectiveStatus, estimatedSpend, selectCampaigns, type AdvertiserRec } from "./select";
+ import { campaignSchema, placementSchema } from "./definitions";
+ import { serveAds, registerClick, type AdData, type CampaignFull, type ServeDeps } from "./serve";
+ import { createMemoryAnalyticsStore } from "@/features/analytics/store";
+diff --git a/src/features/assistant/service.ts b/src/features/assistant/service.ts
+index 29ebfb1..849f562 100644
+--- a/src/features/assistant/service.ts
++++ b/src/features/assistant/service.ts
+@@ -49,7 +49,8 @@ export async function chat(deps: AssistantDeps, actor: ChatActor | null, visitor
+       tools: result.meta.toolNames, rounds: result.meta.rounds, verifiedItems: result.verified.length, removedSentences: result.meta.removed,
+       safetyResponse: result.safetyResponse ?? false, inputTokens: result.meta.inputTokens ?? null, outputTokens: result.meta.outputTokens ?? null, latencyMs: Date.now() - started,
+     }).catch((e) => console.error("[assistant] log failed", e));
+-    const { meta: _meta, ...reply } = result;
++    const reply = { ...result } as Omit<typeof result, "meta"> & { meta?: unknown };
++    delete reply.meta; // internal diagnostics are logged above, never returned to the client
+     return ok({ ...reply, remaining: decision.remaining });
+   } catch (error) {
+     if (error instanceof AiConfigError) console.error("[assistant] misconfigured:", error.message);
+diff --git a/src/features/content/pages.tsx b/src/features/content/pages.tsx
+index 84124af..760caf2 100644
+--- a/src/features/content/pages.tsx
++++ b/src/features/content/pages.tsx
+@@ -12,7 +12,7 @@ import { getSiteUrl } from "@/lib/seo/site";
+ import { localizedPath, type SeoLang } from "@/lib/seo/paths";
+ import { buildMetadata } from "@/lib/seo/metadata";
+ import { article as articleLd, faqPage } from "@/lib/seo/jsonld";
+-import { metaDescription, readingMinutes } from "@/lib/seo/text";
++import { readingMinutes } from "@/lib/seo/text";
+ import { markdownToPlainText, parseMarkdown, extractHeadings } from "@/lib/content/markdown";
+ import { availableLangs, hasLanguage, isIndexable, pickLang, type ContentKey } from "@/lib/content/indexing";
+ import { CONTENT_SECTIONS, contentPath } from "./sections";
+diff --git a/src/features/family/service.test.ts b/src/features/family/service.test.ts
+index 216fc67..b0b8961 100644
+--- a/src/features/family/service.test.ts
++++ b/src/features/family/service.test.ts
+@@ -1,3 +1,4 @@
++/* eslint-disable @typescript-eslint/no-explicit-any -- test doubles intentionally bypass strict types */
+ import { describe, it, expect, beforeEach } from "vitest";
+ import * as svc from "./service";
+ import { createMemoryFamilyStore } from "./memoryStore";
+diff --git a/src/features/lostFound/service.test.ts b/src/features/lostFound/service.test.ts
+index 99203f8..258a174 100644
+--- a/src/features/lostFound/service.test.ts
++++ b/src/features/lostFound/service.test.ts
+@@ -1,3 +1,4 @@
++/* eslint-disable @typescript-eslint/no-explicit-any -- test doubles intentionally bypass strict types */
+ import { describe, it, expect, beforeEach } from "vitest";
+ import { getReport, listMine, listPublic, moderate, moderationQueue, respond, listResponses, resolveReport, submitReport, toPublicView, type Deps } from "./service";
+ import { createMemoryLostFoundStore } from "./memoryStore";
+diff --git a/src/features/notifications/service.test.ts b/src/features/notifications/service.test.ts
+index 4520ad3..004b6e8 100644
+--- a/src/features/notifications/service.test.ts
++++ b/src/features/notifications/service.test.ts
+@@ -1,3 +1,4 @@
++/* eslint-disable @typescript-eslint/no-explicit-any -- test doubles intentionally bypass strict types */
+ import { describe, it, expect, beforeEach } from "vitest";
+ import * as svc from "./service";
+ import { createFakePush, createMemoryNotificationStore } from "./memoryStore";
+diff --git a/src/features/restaurants/definition.ts b/src/features/restaurants/definition.ts
+index 5491f2b..5110c44 100644
+--- a/src/features/restaurants/definition.ts
++++ b/src/features/restaurants/definition.ts
+@@ -1,7 +1,7 @@
+ import { z } from "zod";
+ import type { CatalogDefinition, CatalogRecord } from "@/lib/catalog/types";
+ import {
+-  localizedRequired, localizedOptional, geoSchema, hhmmSchema, inrSchema, seoSchema, imagesSchema, eventIdsSchema,
++  localizedRequired, geoSchema, hhmmSchema, inrSchema, seoSchema, imagesSchema, eventIdsSchema,
+   DEFAULT_GEO, EMPTY_LOCALIZED, EMPTY_SEO, options, imagesField, seoField, eventIdsField, WEEKDAY_OPTIONS, WEEKDAY_VALUES,
+ } from "@/features/catalog/common";
+ 
+diff --git a/src/lib/ai/config.ts b/src/lib/ai/config.ts
+index 2214841..e01a5ec 100644
+--- a/src/lib/ai/config.ts
++++ b/src/lib/ai/config.ts
+@@ -1,8 +1,12 @@
+ import { AiConfigError } from "./types";
+ 
++/** Groq-hosted model with tool calling. Override with AI_MODEL if Groq retires it. */
++export const DEFAULT_GROQ_MODEL = "llama-3.3-70b-versatile";
++export const GROQ_BASE_URL = "https://api.groq.com/openai/v1";
++
+ export interface AiConfig {
+   enabled: boolean;
+-  provider: "anthropic" | "openai";
++  provider: "groq" | "anthropic" | "openai";
+   model: string;
+   apiKey: string;
+   baseUrl?: string;
+@@ -15,18 +19,18 @@ export interface AiConfig {
+  * required (not defaulted) so a deploy can't silently run on a stale model.
+  *
+  *   AI_ENABLED     "false" turns the assistant off (kill switch)
+- *   AI_PROVIDER    "anthropic" (default) | "openai" (any OpenAI-compatible API)
+- *   AI_MODEL       model id from your provider's console
+- *   AI_API_KEY     provider key (ANTHROPIC_API_KEY / OPENAI_API_KEY also accepted)
++ *   AI_PROVIDER    "groq" (default, free tier) | "anthropic" | "openai" (any OpenAI-compatible API)
++ *   AI_MODEL       model id; for groq defaults to DEFAULT_GROQ_MODEL when unset
++ *   AI_API_KEY     provider key (GROQ_API_KEY / ANTHROPIC_API_KEY / OPENAI_API_KEY also accepted)
+  *   AI_BASE_URL    optional override (proxy, gateway, self-hosted)
+  *   AI_TIMEOUT_MS  per-request timeout, default 30000
+  */
+ export function readAiConfig(env: Record<string, string | undefined> = process.env): AiConfig {
+   const enabled = (env.AI_ENABLED ?? "true").toLowerCase() !== "false";
+-  const provider = (env.AI_PROVIDER ?? "anthropic").toLowerCase();
+-  if (provider !== "anthropic" && provider !== "openai") throw new AiConfigError(`Unsupported AI_PROVIDER "${provider}"`);
+-  const apiKey = env.AI_API_KEY ?? (provider === "anthropic" ? env.ANTHROPIC_API_KEY : env.OPENAI_API_KEY) ?? "";
+-  const model = (env.AI_MODEL ?? "").trim();
++  const provider = (env.AI_PROVIDER ?? "groq").toLowerCase();
++  if (provider !== "groq" && provider !== "anthropic" && provider !== "openai") throw new AiConfigError(`Unsupported AI_PROVIDER "${provider}"`);
++  const apiKey = env.AI_API_KEY ?? (provider === "groq" ? env.GROQ_API_KEY : provider === "anthropic" ? env.ANTHROPIC_API_KEY : env.OPENAI_API_KEY) ?? "";
++  const model = (env.AI_MODEL ?? "").trim() || (provider === "groq" ? DEFAULT_GROQ_MODEL : "");
+   if (enabled && !apiKey) throw new AiConfigError("AI_API_KEY is not set");
+   if (enabled && !model) throw new AiConfigError("AI_MODEL is not set");
+   const timeout = Number(env.AI_TIMEOUT_MS);
+@@ -35,7 +39,7 @@ export function readAiConfig(env: Record<string, string | undefined> = process.e
+     provider,
+     model,
+     apiKey,
+-    baseUrl: env.AI_BASE_URL?.trim() || undefined,
++    baseUrl: env.AI_BASE_URL?.trim() || (provider === "groq" ? GROQ_BASE_URL : undefined),
+     timeoutMs: Number.isFinite(timeout) && timeout >= 1000 ? timeout : 30_000,
+   };
+ }
+diff --git a/src/lib/ai/providers.test.ts b/src/lib/ai/providers.test.ts
+index 8a32116..d17540a 100644
+--- a/src/lib/ai/providers.test.ts
++++ b/src/lib/ai/providers.test.ts
+@@ -38,8 +38,10 @@ describe("provider adapters", () => {
+ describe("readAiConfig", () => {
+   it("requires key and model when enabled", () => {
+     expect(() => readAiConfig({})).toThrow();
+-    expect(() => readAiConfig({ AI_API_KEY: "k" })).toThrow();
+-    expect(readAiConfig({ AI_API_KEY: "k", AI_MODEL: "m" })).toMatchObject({ provider: "anthropic", model: "m", enabled: true });
++    expect(() => readAiConfig({ AI_PROVIDER: "openai", AI_API_KEY: "k" })).toThrow(); // model has no default outside groq
++    expect(readAiConfig({ AI_API_KEY: "k", AI_MODEL: "m" })).toMatchObject({ provider: "groq", model: "m", enabled: true });
++    expect(readAiConfig({ GROQ_API_KEY: "g" })).toMatchObject({ provider: "groq", model: "llama-3.3-70b-versatile", baseUrl: "https://api.groq.com/openai/v1" });
++    expect(readAiConfig({ AI_PROVIDER: "anthropic", ANTHROPIC_API_KEY: "a", AI_MODEL: "m" }).provider).toBe("anthropic");
+   });
+   it("can be switched off and swapped by env alone", () => {
+     expect(readAiConfig({ AI_ENABLED: "false" }).enabled).toBe(false);
+diff --git a/src/lib/ai/providers/index.ts b/src/lib/ai/providers/index.ts
+index 9511e74..c905fa5 100644
+--- a/src/lib/ai/providers/index.ts
++++ b/src/lib/ai/providers/index.ts
+@@ -8,6 +8,7 @@ export function createProvider(config: AiConfig = readAiConfig()): LlmProvider {
+   switch (config.provider) {
+     case "anthropic":
+       return createAnthropicProvider(config);
++    case "groq": // Groq speaks the OpenAI chat-completions protocol; config supplies its base URL
+     case "openai":
+       return createOpenAiProvider(config);
+   }
+diff --git a/src/lib/ai/providers/openai.ts b/src/lib/ai/providers/openai.ts
+index a454869..d8dd1f1 100644
+--- a/src/lib/ai/providers/openai.ts
++++ b/src/lib/ai/providers/openai.ts
+@@ -47,7 +47,7 @@ export function fromOpenAiResponse(res: OpenAiResponse): GenerateResult {
+ export function createOpenAiProvider(config: AiConfig): LlmProvider {
+   const base = (config.baseUrl ?? "https://api.openai.com/v1").replace(/\/+$/, "");
+   return {
+-    name: "openai",
++    name: config.provider,
+     model: config.model,
+     async generate(req: GenerateRequest) {
+       const body = {
+diff --git a/src/lib/analytics/client.ts b/src/lib/analytics/client.ts
+index 7ef9364..0c0a4d4 100644
+--- a/src/lib/analytics/client.ts
++++ b/src/lib/analytics/client.ts
+@@ -11,7 +11,7 @@ import type { AnalyticsEventInput } from "./events";
+  */
+ type Outgoing = Partial<AnalyticsEventInput> & { type: AnalyticsEventInput["type"] };
+ 
+-let queue: Outgoing[] = [];
++const queue: Outgoing[] = [];
+ let timer: ReturnType<typeof setTimeout> | null = null;
+ 
+ export function analyticsAllowed(): boolean {
+diff --git a/src/lib/catalog/server/repository.ts b/src/lib/catalog/server/repository.ts
+index 7cc8622..e2f6619 100644
+--- a/src/lib/catalog/server/repository.ts
++++ b/src/lib/catalog/server/repository.ts
+@@ -60,6 +60,19 @@ function searchTerm(def: CatalogDefinition, data: Record<string, unknown>): stri
+   return (title?.en ?? "").toLowerCase();
+ }
+ 
++/** Firestore reports a missing composite index as code 9 with a console link. Log it where Vercel logs will show it, then rethrow unchanged. */
++async function withIndexHint<T>(collection: string, run: () => Promise<T>): Promise<T> {
++  try {
++    return await run();
++  } catch (e) {
++    const err = e as { code?: number | string; message?: string };
++    if (err?.code === 9 || String(err?.message ?? "").includes("requires an index")) {
++      console.error(`[firestore] MISSING INDEX for "${collection}" — run: firebase deploy --only firestore:indexes. ${err.message ?? ""}`);
++    }
++    throw e;
++  }
++}
++
+ export async function listCatalog(def: CatalogDefinition, options: ListOptions = {}): Promise<PageResult<StoredRecord>> {
+   const { pageSize = 12, cursor, includeUnpublished = false, search, filters = {}, publicView = false } = options;
+   const map = mapCatalogDoc(def, publicView);
+@@ -75,10 +88,10 @@ export async function listCatalog(def: CatalogDefinition, options: ListOptions =
+ 
+   // Prefix search is a bounded, un-paginated read (same trade-off as Sprint 3 ghats/temples).
+   if (term) {
+-    const snapshot = await query.limit(pageSize).get();
++    const snapshot = await withIndexHint(def.collection, () => query.limit(pageSize).get());
+     return { items: snapshot.docs.map(map), nextCursor: null };
+   }
+-  return paginateQuery<StoredRecord>(query, map, { pageSize, cursor });
++  return withIndexHint(def.collection, () => paginateQuery<StoredRecord>(query, map, { pageSize, cursor }));
+ }
+ 
+ export async function getCatalog(
+diff --git a/src/lib/safety/safety.test.ts b/src/lib/safety/safety.test.ts
+index e68b037..af84f81 100644
+--- a/src/lib/safety/safety.test.ts
++++ b/src/lib/safety/safety.test.ts
+@@ -1,3 +1,4 @@
++/* eslint-disable @typescript-eslint/no-explicit-any -- test doubles intentionally bypass strict types */
+ import { describe, it, expect } from "vitest";
+ import { isPlausiblePhone, telHref } from "./phone";
+ import { haversineMeters, sortByDistance } from "./geo";
