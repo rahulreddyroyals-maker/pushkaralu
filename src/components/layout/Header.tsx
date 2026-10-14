@@ -162,12 +162,12 @@ export function Header() {
             aria-label="Close menu"
             tabIndex={-1}
             onClick={() => setMobileOpen(false)}
-            className="fixed inset-x-0 bottom-0 top-[67px] z-30 bg-ink/40 xl:hidden"
+            className="fixed inset-x-0 bottom-0 top-[67px] z-30 bg-ink/30 xl:hidden"
           />
           <nav
             id="mobile-nav-panel"
             aria-label="Mobile primary"
-            className="absolute inset-x-0 top-full z-40 max-h-[calc(100dvh-67px)] overflow-y-auto rounded-b-2xl border-b border-gold/50 bg-surface-raised px-4 pb-5 pt-3 shadow-xl xl:hidden"
+            className="absolute inset-x-0 top-full z-40 max-h-[calc(100dvh-67px)] overflow-y-auto rounded-b-2xl border-b border-gold/50 bg-surface-raised px-4 pb-5 pt-3 shadow-xl sm:inset-x-auto sm:right-4 sm:mt-2 sm:w-[22rem] sm:rounded-2xl sm:border sm:border-gold/50 xl:hidden"
           >
             <ul className="flex flex-col divide-y divide-border/70">
               {PRIMARY_NAV.map((link) => (

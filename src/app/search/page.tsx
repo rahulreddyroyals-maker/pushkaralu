@@ -27,6 +27,9 @@ async function safe<T>(p: Promise<T>): Promise<T | null> {
 }
 
 const TOPIC_LINKS: { match: RegExp; label: string; href: string }[] = [
+  { match: /temple|alayam|devalay/i, label: "Temples", href: ROUTES.temples },
+  { match: /hotel|stay|lodge/i, label: "Hotels", href: ROUTES.hotels },
+  { match: /purohit|priest|pandit/i, label: "Purohits", href: ROUTES.purohits },
   { match: /ghat|snan|bath/i, label: "Ghats", href: ROUTES.ghats },
   { match: /event|date|calendar|pushkar/i, label: "Events", href: ROUTES.events },
   { match: /emergency|help|police|medical/i, label: "Emergency help", href: ROUTES.emergency },
@@ -46,16 +49,25 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const topics = term ? TOPIC_LINKS.filter((t) => t.match.test(term)) : [];
 
   if (term) {
+    const words = term.toLowerCase().split(/\s+/).filter(Boolean).map((w) => (w.length > 3 && w.endsWith("s") ? w.slice(0, -1) : w));
+    const matches = (...fields: (string | undefined)[]) => {
+      const hay = fields.filter(Boolean).join(" ").toLowerCase();
+      return words.every((w) => hay.includes(w));
+    };
+    // Browse a bounded set and filter in memory so matches work anywhere in the name,
+    // description or address (Firestore has no "contains" query).
     const [hotels, temples, purohits, businesses] = await Promise.all([
-      safe(listHotels({ search: term, pageSize: 6 })),
-      safe(listTemples({ search: term, pageSize: 6 })),
-      safe(listPurohits({ search: term, pageSize: 6 })),
-      safe(listBusinesses({ search: term, pageSize: 6 })),
+      safe(listHotels({ pageSize: 100 })),
+      safe(listTemples({ pageSize: 100 })),
+      safe(listPurohits({ pageSize: 100 })),
+      safe(listBusinesses({ pageSize: 100 })),
     ]);
-    hotels?.items.forEach((h) => hits.push({ href: `/hotels/${h.id}`, title: h.name.en, kind: "Hotel", blurb: h.address }));
-    temples?.items.forEach((t) => hits.push({ href: `/temples/${t.id}`, title: t.name.en, kind: "Temple", blurb: t.address }));
-    purohits?.items.forEach((p) => hits.push({ href: `/purohits/${p.id}`, title: p.name.en, kind: "Purohit" }));
-    businesses?.items.forEach((b) => hits.push({ href: `/businesses/${b.id}`, title: b.name.en, kind: "Business" }));
+    const isKind = (kind: string) => words.some((w) => kind.toLowerCase().startsWith(w) || w.startsWith(kind.toLowerCase()));
+    const only = (kind: string, textMatch: boolean) => textMatch || isKind(kind);
+    hotels?.items.forEach((h) => only("Hotel", matches(h.name.en, h.name.te, h.description?.en, h.address)) && hits.push({ href: `/hotels/${h.id}`, title: h.name.en, kind: "Hotel", blurb: h.address }));
+    temples?.items.forEach((t) => only("Temple", matches(t.name.en, t.name.te, t.description?.en, t.address)) && hits.push({ href: `/temples/${t.id}`, title: t.name.en, kind: "Temple", blurb: t.address }));
+    purohits?.items.forEach((p) => only("Purohit", matches(p.name.en, p.name.te)) && hits.push({ href: `/purohits/${p.id}`, title: p.name.en, kind: "Purohit" }));
+    businesses?.items.forEach((b) => matches(b.name.en, b.name.te) && hits.push({ href: `/businesses/${b.id}`, title: b.name.en, kind: "Business" }));
   }
 
   return (
